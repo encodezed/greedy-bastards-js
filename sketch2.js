@@ -36,6 +36,7 @@ function mouseClicked()
 
 function moveDireita (qtd)
 {
+
     personagem.corpo.cabeca.x += qtd
     personagem.corpo.tronco.x += qtd
     personagem.corpo.bracodireito.x += qtd
@@ -44,6 +45,7 @@ function moveDireita (qtd)
     personagem.corpo.pernas.x += qtd
     personagem.corpo.rabo.x += qtd 
     personagem.corpo.sombra.x += qtd
+    personagem.corpo.cabeca.mirror.x = true
 }
 
 function moveEsquerda (qtd)
@@ -56,6 +58,7 @@ function moveEsquerda (qtd)
     personagem.corpo.pernas.x -= qtd
     personagem.corpo.rabo.x -= qtd 
     personagem.corpo.sombra.x -= qtd
+    personagem.corpo.cabeca.mirror.x = false
 }
 
 function moveCima (qtd)
