@@ -43,9 +43,17 @@ function moveDireita (qtd)
     personagem.corpo.bracoesquerdo.x += qtd
     personagem.corpo.katana.x += qtd 
     personagem.corpo.pernas.x += qtd
-    personagem.corpo.rabo.x += qtd 
+    if (personagem.corpo.rabo.mirror.x){
+
+        personagem.corpo.rabo.x += qtd
+    }else{
+        personagem.corpo.rabo.mirror.x = true
+        personagem.corpo.rabo.x += qtd -28
+    }
     personagem.corpo.sombra.x += qtd
     personagem.corpo.cabeca.mirror.x = true
+    
+
 }
 
 function moveEsquerda (qtd)
@@ -56,9 +64,18 @@ function moveEsquerda (qtd)
     personagem.corpo.bracoesquerdo.x -= qtd
     personagem.corpo.katana.x -= qtd 
     personagem.corpo.pernas.x -= qtd
-    personagem.corpo.rabo.x -= qtd 
+    if (personagem.corpo.rabo.mirror.x)
+    {
+        personagem.corpo.rabo.mirror.x = false
+        personagem.corpo.rabo.x -= (qtd - 28)
+    }else{
+        personagem.corpo.rabo.x -= qtd
+
+    }
+     
     personagem.corpo.sombra.x -= qtd
     personagem.corpo.cabeca.mirror.x = false
+    
 }
 
 function moveCima (qtd)
