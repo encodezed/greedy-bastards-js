@@ -19,8 +19,8 @@ function iniInimigos ()
    
     inimigos.push({
                 nome:"goblin",
-                x:width/2 + 50,
-                y:height/2+7,
+                x:width/2 + 64,
+                y:height/2 + 64,
                 corpo : new Group()
 
     });
@@ -29,24 +29,24 @@ function iniInimigos ()
     let sombra = new Sprite (loadImage("Arte/Sprites/Goblin/sombra.png"));
     sombra.overlap(allSprites);
     sombra.x = inimigos[GOBLIN].x 
-    sombra.y = inimigos[GOBLIN].y +13.4
-    sombra.scale = 0.8
+    sombra.y = inimigos[GOBLIN].y +21
+    sombra.scale = 1.9
   
     inimigos[GOBLIN].corpo.push (sombra);
 
     let pernas = new Sprite (loadImage("Arte/Sprites/Goblin/pernas.png"));
     pernas.overlap(allSprites);
-    pernas.x = inimigos[GOBLIN].x -0.5
-    pernas.y = inimigos[GOBLIN].y +18
-    pernas.scale = 0.8
+    pernas.x = inimigos[GOBLIN].x -1
+    pernas.y = inimigos[GOBLIN].y +29
+    pernas.scale = 1.2
   
     inimigos[GOBLIN].corpo.push (pernas);
 
     let bracodireito = new Sprite (loadImage("Arte/Sprites/Goblin/bracodireito.png"));
     bracodireito.overlap(allSprites);
-    bracodireito.x = inimigos[GOBLIN].x+17
-    bracodireito.y = inimigos[GOBLIN].y +1
-    bracodireito.scale = 0.8
+    bracodireito.x = inimigos[GOBLIN].x+19
+    bracodireito.y = inimigos[GOBLIN].y +3
+    bracodireito.scale = 1.2
   
     inimigos[GOBLIN].corpo.push (bracodireito);
 
@@ -54,16 +54,16 @@ function iniInimigos ()
     tronco.overlap(allSprites);
     tronco.x = inimigos[GOBLIN].x
     tronco.y = inimigos[GOBLIN].y
-    tronco.scale = 0.8
+    tronco.scale = 1.2
   
     inimigos[GOBLIN].corpo.push (tronco);
 
 
     let bracoesquerdo = new Sprite (loadImage("Arte/Sprites/Goblin/bracoesquerdo.png"));
     bracoesquerdo.overlap(allSprites);
-    bracoesquerdo.x = inimigos[GOBLIN].x-7.5
+    bracoesquerdo.x = inimigos[GOBLIN].x-12
     bracoesquerdo.y = inimigos[GOBLIN].y 
-    bracoesquerdo.scale = 0.8
+    bracoesquerdo.scale = 1.2
   
     inimigos[GOBLIN].corpo.push (bracoesquerdo);
 
@@ -72,8 +72,8 @@ function iniInimigos ()
     let cabeca = new Sprite (loadImage("Arte/Sprites/Goblin/cabeca.png"));
     cabeca.overlap(allSprites);
     cabeca.x = inimigos[GOBLIN].x +1.1
-    cabeca.y = inimigos[GOBLIN].y -10
-    cabeca.scale = 0.8
+    cabeca.y = inimigos[GOBLIN].y -13
+    cabeca.scale = 1.2
   
     inimigos[GOBLIN].corpo.push (cabeca);
 
@@ -84,11 +84,11 @@ function doAnimIni()
     
     p5.tween.manager
         .addTween (inimigos[GOBLIN].corpo.get(TRONCO))
-        .addMotion ('scale', 0.83,3100,'easeInOutElastic')
+        .addMotion ('scale', 1.25,3100,'easeInOutElastic')
         .startLoop()
     p5.tween.manager
         .addTween (inimigos[GOBLIN].corpo.get(CABECA))
-        .addMotion ('scale', 0.81,4000,'easeInOutElastic')
+        .addMotion ('scale', 1.25,4000,'easeInOutElastic')
         .startLoop()
 
         p5.tween.manager

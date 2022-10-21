@@ -1,4 +1,14 @@
+/*
+esse é o main 
 
+TODOS:
+    -animação relativa a player no player.js e inimigo em inimigos.js
+    -animar um createGraphics() e plotar isso no sprite e não animar os sprites, 
+    qdo animar o sprite vai tudo junto
+    -carregar imagens no preload()
+
+
+*/
 
 const animacoes = {
     idle:0,
@@ -42,11 +52,12 @@ function setup()
    
     createCanvas (800,600);
     noSmooth()
+    
     initMundo()
     iniPersonagem();
     iniUi()
 
-    doAnim(animacoes.idle)
+    
     
     iniInimigos()
     doAnimIni()
@@ -76,6 +87,7 @@ drawPlayer();
 
 drawInimigos();
 drawUI();
+drawSpotlight();
 
 
 }

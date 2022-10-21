@@ -1,3 +1,9 @@
+/*
+coisas relacionadas ao player
+
+
+
+*/
 let gchar
 let personagem
 
@@ -34,6 +40,7 @@ function iniPersonagem() {
     gchar.push (personagem.corpo.sombra)
 
 
+
     personagem.corpo.cabeca.x = width / 2;
     personagem.corpo.cabeca.y = height / 2;
     personagem.corpo.cabeca.overlap(allSprites);
@@ -65,6 +72,8 @@ function iniPersonagem() {
     personagem.corpo.katana.x = width / 2 + 10;
     personagem.corpo.katana.y = height / 2 - 5;
     personagem.corpo.katana.overlap(allSprites);
+
+    doAnim(animacoes.idle)
 }
 
 

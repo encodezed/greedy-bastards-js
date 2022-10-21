@@ -1,11 +1,21 @@
+/*
+UI
+TODOS:
+    -overlay transparente
+
+*/
+
 let vial
 let vial2
 let vida
 let fonte
+let spotlight
+let imgspotlight
 
 
 function iniUi()
 {
+    imgspotlight = loadImage("Arte/UI/spotlight.png")
 
     fonte = loadFont("/fontes/blocks.ttf")
     vial = new Sprite (loadImage("Arte/UI/vial.png"))
@@ -25,6 +35,27 @@ function iniUi()
     vida.x = 90
     vida.y = height - 90
     vida.scale = 2.8
+
+    spotlight = new Sprite(imgspotlight)
+    spotlight.x =width/2
+    spotlight.y = height/2
+    spotlight.overlap(allSprites)
+    //spotlight.visible = false
+
+}
+
+function drawSpotlight()
+{
+    push()
+    blendMode(OVERLAY)
+    tint (210,210,190,250)
+    spotlight.draw()
+     
+    pop()
+    spotlight.x =width/2
+    spotlight.y = height/2
+
+
 
 }
 
