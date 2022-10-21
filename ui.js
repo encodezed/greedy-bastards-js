@@ -8,6 +8,7 @@ TODOS:
 let vial
 let vial2
 let vida
+let vidaoverlay
 let fonte
 let spotlight
 let imgspotlight
@@ -18,6 +19,8 @@ function iniUi()
     imgspotlight = loadImage("Arte/UI/spotlight.png")
 
     fonte = loadFont("/fontes/blocks.ttf")
+
+
     vial = new Sprite (loadImage("Arte/UI/vial.png"))
     vial.overlap (allSprites)
     vial.x = 90
@@ -36,33 +39,60 @@ function iniUi()
     vida.y = height - 90
     vida.scale = 2.8
 
+
+    vidaoverlay = new Sprite (loadImage("Arte/UI/vida.png"))
+    vidaoverlay.overlap (allSprites)
+    vidaoverlay.x = 90
+    vidaoverlay.y = height - 140
+    vidaoverlay.scale = 2.8
+
+
     spotlight = new Sprite(imgspotlight)
     spotlight.x =width/2
     spotlight.y = height/2
+    spotlight.scale = 0.75
     spotlight.overlap(allSprites)
-    //spotlight.visible = false
+   
 
 }
 
 function drawSpotlight()
 {
+    camera.off()
     push()
     blendMode(OVERLAY)
-    tint (210,210,190,250)
+    tint (210,210,190,195)
     spotlight.draw()
-     
     pop()
     spotlight.x =width/2
     spotlight.y = height/2
+    camera.on()
 
 
+}
+
+function drawVida ()
+{
+
+    camera.off()
+
+    push()
+    vida.draw()
+  
+    blendMode(REMOVE)
+    
+    vidaoverlay.draw()
+   
+    pop()
+    camera.on()
 
 }
 
 function drawUI ()
 {
 camera.off ()
-vida.draw()
+
+
 vial.draw()
 vial2.draw()
 push()
@@ -85,5 +115,5 @@ text ("OURO: 10",width/2,height-20)
 text ("PERÍCIAS",width/2,height-130)
 text ("XP: 5",width/2,height-40)
 pop()
-
+camera.on()
 }

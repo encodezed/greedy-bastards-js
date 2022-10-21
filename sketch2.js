@@ -71,8 +71,10 @@ function draw()
 {
 camera.x = personagem.x
 camera.y = personagem.y
-background (20);
-gradiente();
+
+background (0);
+
+//gradiente();
 
 camera.on();
 
@@ -83,12 +85,18 @@ camera.zoom = 2.5;
 //tint (200,10,10)
 //personagem.corpo.cabeca.draw()
 drawMundo();
-drawPlayer();
 
+drawVida()
 drawInimigos();
+
+
+
+
+
+
+drawPlayer()
 drawUI();
 drawSpotlight();
-
 
 }
 
