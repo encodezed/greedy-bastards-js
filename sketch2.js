@@ -86,18 +86,12 @@ camera.zoom = 2.5;
 //personagem.corpo.cabeca.draw()
 drawMundo();
 
-drawVida()
+
 drawInimigos();
-
-
-
-
-
-
+drawSpotlight();
+drawVida()
 drawPlayer()
 drawUI();
-drawSpotlight();
-
 }
 
 

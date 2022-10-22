@@ -65,7 +65,7 @@ function drawSpotlight()
     camera.off()
     push()
     blendMode(OVERLAY)
-    tint (210,210,190,noise(cos(frameCount*2))*455)
+    tint (215,225,140,210+noise(cos(frameCount*15))*25)
     spotlight.draw()
     pop()
     spotlight.x =width/2
