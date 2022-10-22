@@ -1,6 +1,10 @@
 /*
 UI
 TODOS:
+
+
+
+DONE:
     -overlay transparente
 
 */
@@ -61,7 +65,7 @@ function drawSpotlight()
     camera.off()
     push()
     blendMode(OVERLAY)
-    tint (210,210,190,195)
+    tint (210,210,190,noise(cos(frameCount*2))*455)
     spotlight.draw()
     pop()
     spotlight.x =width/2
