@@ -7,6 +7,37 @@ coisas relacionadas ao player
 let gchar
 let personagem
 
+
+const animacoes = {
+    idle:0,
+    ataca:1
+}
+
+//funcao que anima o corpo do personagem
+//todo: selecionar se faz uma vez ou loop, se for uma vez oq vem depois ou volta pro idle
+function doAnim(animacao = animacoes.idle){
+
+
+    if (animacao == animacoes.idle)
+    {
+        let ani = personagem.corpo.cabeca.animation //pega a spritesheet
+        let imagem = ani.images[0] //pega a imagem que esta no personagem
+    
+        p5.tween.manager
+            .addTween (personagem.corpo.tronco)
+            .addMotion ('scale', 1.03,1000,'easeInOutSin')
+            .startLoop()
+        p5.tween.manager
+            .addTween (personagem.corpo.cabeca)
+            .addMotion ('scale', 1.01,2000,'easeInOutSin')
+            .startLoop()
+        p5.tween.manager
+            .addTween (personagem.corpo.bracodireito)
+            .addMotion ('scale', 1.01,2000,'easeInOutSin')
+            .startLoop()
+    }
+}
+
 function iniPersonagem() {
 
     personagem = {
@@ -52,6 +83,9 @@ function iniPersonagem() {
     personagem.corpo.bracoesquerdo.x = width / 2 - 9;
     personagem.corpo.bracoesquerdo.y = height / 2 + 8;
     personagem.corpo.bracoesquerdo.overlap(allSprites);
+    personagem.corpo.bracoesquerdo.rotation = 23
+   
+
 
     personagem.corpo.bracodireito.x = width / 2 + 8;
     personagem.corpo.bracodireito.y = height / 2 + 9;

@@ -1,5 +1,5 @@
 function mouseClicked() {
-
+    doGreedynomicon()
 }
 function moveDireita(qtd) {
     personagem.x += qtd
@@ -72,6 +72,7 @@ function moveBaixo(qtd) {
 function keyReleased() {
     switch (keyCode) {
         case RIGHT_ARROW:
+            
             moveDireita(personagem.velocidade);
             break;
         case LEFT_ARROW:

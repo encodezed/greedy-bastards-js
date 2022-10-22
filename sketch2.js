@@ -9,11 +9,10 @@ TODOS:
 
 
 */
+var rotation = 100  
+var gui
 
-const animacoes = {
-    idle:0,
-    ataca:1
-}
+
 
 function preload ()
 {  
@@ -22,42 +21,24 @@ function preload ()
 
 }
 
-//funcao que anima o corpo do personagem
-//todo: selecionar se faz uma vez ou loop, se for uma vez oq vem depois ou volta pro idle
-function doAnim(animacao = animacoes.idle){
 
-
-    if (animacao == animacoes.idle)
-    {
-        let ani = personagem.corpo.cabeca.animation //pega a spritesheet
-        let imagem = ani.images[0] //pega a imagem que esta no personagem
-    
-        p5.tween.manager
-            .addTween (personagem.corpo.tronco)
-            .addMotion ('scale', 1.03,1000,'easeInOutSin')
-            .startLoop()
-        p5.tween.manager
-            .addTween (personagem.corpo.cabeca)
-            .addMotion ('scale', 1.01,2000,'easeInOutSin')
-            .startLoop()
-        p5.tween.manager
-            .addTween (personagem.corpo.bracodireito)
-            .addMotion ('scale', 1.01,2000,'easeInOutSin')
-            .startLoop()
-    }
-}
 
 function setup()
 {
    
     createCanvas (800,600);
     noSmooth()
+
+
     
     initMundo()
     iniPersonagem();
     iniUi()
 
-    
+//    gui = createGui ()
+ //   gui.addGlobals ('rotation')
+   // sliderRange (0,360,10)
+   // gui.addGlobals ('personagem.corpo.bracoesquerdo.rotation' )
     
     iniInimigos()
     doAnimIni()
@@ -77,6 +58,8 @@ background (0);
 //gradiente();
 
 camera.on();
+tint(240+ noise (frameCount)*300,240+ noise (frameCount)*300,140+ noise (frameCount)*200)
+
 
 camera.zoom = 2.5;
 //allSprites.draw();
@@ -84,6 +67,8 @@ camera.zoom = 2.5;
 //o codigo abaixo possibilita vc mudar de cor apenas um pedaço do personagem
 //tint (200,10,10)
 //personagem.corpo.cabeca.draw()
+
+//personagem.corpo.bracoesquerdo.rotation = rotation
 drawMundo();
 
 

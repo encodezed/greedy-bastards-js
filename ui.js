@@ -17,10 +17,16 @@ let fonte
 let spotlight
 let imgspotlight
 
+let imggreedynomicon
+let greedynomicon
+
 
 function iniUi()
 {
     imgspotlight = loadImage("Arte/UI/spotlight.png")
+
+    imggreedynomicon = loadImage ("Arte/UI/greedynomicon.png")
+
 
     fonte = loadFont("/fontes/blocks.ttf")
 
@@ -60,6 +66,22 @@ function iniUi()
 
 }
 
+function doGreedynomicon ()
+
+{
+
+    
+    greedynomicon = new Sprite(imggreedynomicon)
+    greedynomicon.overlap (allSprites)
+    greedynomicon.x = width/2
+    greedynomicon.y = height/2
+
+    
+
+
+
+}
+
 function drawSpotlight()
 {
     camera.off()
@@ -92,9 +114,12 @@ function drawVida ()
 
 }
 
+
+
 function drawUI ()
 {
 camera.off ()
+
 
 
 vial.draw()
