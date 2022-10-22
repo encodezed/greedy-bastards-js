@@ -73,10 +73,15 @@ drawMundo();
 
 
 drawInimigos();
+
+
+drawPlayer()
+drawGreedynomicon();
 drawSpotlight();
 drawVida()
-drawPlayer()
 drawUI();
+
+
 }
 
 

@@ -16,6 +16,7 @@ let vidaoverlay
 let fonte
 let spotlight
 let imgspotlight
+let inventario = false
 
 let imggreedynomicon
 let greedynomicon
@@ -65,16 +66,41 @@ function iniUi()
    
 
 }
+function drawGreedynomicon(){
+
+    if (inventario)
+    {
+        fill(0,150)
+        rect(0,0,width,height)
+        tint(355,355,190,250)
+        greedynomicon.draw()
+        fill(0)
+        textFont(fonte)
+        textSize(10)
+        text("The Greedynomicon", 295,260)
+    
+    }
+
+
+}
 
 function doGreedynomicon ()
 
-{
+{   
+    if (!inventario){
+       
+        greedynomicon = new Sprite(imggreedynomicon)
 
-    
-    greedynomicon = new Sprite(imggreedynomicon)
-    greedynomicon.overlap (allSprites)
-    greedynomicon.x = width/2
-    greedynomicon.y = height/2
+        greedynomicon.scale = .3
+        greedynomicon.overlap (allSprites)
+        greedynomicon.x = width/2
+        greedynomicon.y = height/2
+    }else{
+
+        greedynomicon.remove()
+
+    }
+    inventario = !inventario
 
     
 
