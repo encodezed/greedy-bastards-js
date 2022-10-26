@@ -14,6 +14,7 @@ let vial2
 let vida
 let vidaoverlay
 let fonte
+let fontegoteca
 let spotlight
 let imgspotlight
 let inventario = false
@@ -30,7 +31,7 @@ function iniUi()
 
 
     fonte = loadFont("/fontes/blocks.ttf")
-
+    fontegoteca = loadFont("/fontes/gothic.ttf")
 
     vial = new Sprite (loadImage("Arte/UI/vial.png"))
     vial.overlap (allSprites)
@@ -62,23 +63,65 @@ function iniUi()
     spotlight.x =width/2
     spotlight.y = height/2
     spotlight.scale = 0.75
-    spotlight.overlap(allSprites)
+    spotlight.static = true
    
 
 }
 function drawGreedynomicon(){
 
+    //camera.off()
+    //push()
     if (inventario)
     {
         fill(0,150)
         rect(0,0,width,height)
         tint(355,355,190,250)
         greedynomicon.draw()
+        
+        
+        
+        noFill()
+        
+        rect(personagem.x +50,personagem.y-10, 15,15)
+        rect(personagem.x+50,personagem.y-10-16, 15,15)
+        rect(personagem.x+50,personagem.y-10+16, 15,15)
+        rect(personagem.x+50+16,personagem.y-10, 15,15)
+        rect(personagem.x+50-16,personagem.y-10, 15,15)
+     
+
+        for (let a=0;a <5;a++)
+        {
+            for (let b=0; b< 3;b++)
+            {
+                rect(personagem.x-98+(a*17),personagem.y-27+(b*17), 15,15)
+
+            }
+           
+        }
+        
+
+        blendMode(MULTIPLY)
+
+ 
+        
+        
         fill(0)
-        textFont(fonte)
-        textSize(10)
-        text("The Greedynomicon", 295,260)
-    
+        rectMode(CENTER)
+        rotate(radians(-200))
+
+        
+        blendMode(MULTIPLY)
+
+        textFont(fontegoteca)
+        textSize(14)
+        fill (244,10,10)
+        text("The Greedynomicon", (personagem.x)-120 ,(personagem.y)-25)
+        rotate(radians(-210))
+        textSize(12)
+        text("Mochila", personagem.x-140 ,personagem.y+9)
+        text("Equipado", personagem.x ,personagem.y+27)
+        //camera.on()
+        //pop()
     }
 
 
@@ -93,8 +136,8 @@ function doGreedynomicon ()
 
         greedynomicon.scale = .3
         greedynomicon.overlap (allSprites)
-        greedynomicon.x = width/2
-        greedynomicon.y = height/2
+        greedynomicon.x = personagem.x
+        greedynomicon.y = personagem.y
     }else{
 
         greedynomicon.remove()

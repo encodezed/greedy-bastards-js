@@ -1,3 +1,4 @@
+p5.disableFriendlyErrors = true
 /*
 esse é o main 
 
@@ -25,14 +26,14 @@ function preload ()
 
 function setup()
 {
-   
+   //
     createCanvas (800,600);
     noSmooth()
-
-
     
-    initMundo()
+
     iniPersonagem();
+    initMundo()
+   
     iniUi()
 
 //    gui = createGui ()
@@ -42,6 +43,7 @@ function setup()
     
     iniInimigos()
     doAnimIni()
+    //doGreedynomicon()
         
 }
 
@@ -55,11 +57,11 @@ camera.y = personagem.y
 
 background (0);
 
-//gradiente();
 
 camera.on();
+//allSprites.debug = true 
 tint(240+ noise (frameCount)*300,240+ noise (frameCount)*300,140+ noise (frameCount)*200)
-
+//gparedes.debug = true
 
 camera.zoom = 2.5;
 //allSprites.draw();
@@ -76,6 +78,8 @@ drawInimigos();
 
 
 drawPlayer()
+
+
 drawGreedynomicon();
 drawSpotlight();
 drawVida()
@@ -84,19 +88,3 @@ drawUI();
 
 }
 
-
-
-function gradiente ()
-{
-   
-    c1 = color(25,30);
-    c2 = color(63, 91, 91,100);
-    
-    for(let y=0; y<height; y++){
-      n = map(y,0,height,0,1);
-      let newc = lerpColor(c1,c2,n);
-      stroke(newc);
-      line(0,y,width, y);
-    }
-    
-}

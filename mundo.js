@@ -1,9 +1,13 @@
+p5.disableFriendlyErrors = true
 /* 
 coisas relativas a criação do mundo salas e os escambau
 
 TODOS:
     
-    
+    -refazer a geração de mundo para que faça uma matriz e plote essa matriz
+    os movimentos e colisoes todas feitas usando a matriz ao inves dessa merda de .play     
+
+
     -portas
     -perfumarias
     
@@ -18,6 +22,9 @@ DONE:
 let gsala
 let imgchao
 
+let gparedes
+let gcolisor
+
 let imgCSE
 let imgCSD
 let imgCIE
@@ -26,9 +33,14 @@ let imgE
 let imgD
 let imgC
 let imgB
+function colide (a, b){
+    console.log(a.nome+" colidiu com "+ b.nome)
+
+}
 
 function initMundo ()
 {
+    console.log("initmundo")
     imgchao = loadImage ("Arte/Paredes/17.png")
     imgCSE= loadImage ("Arte/Paredes/00.png") //alterar pra usar um so mirror h e w
     imgCC= loadImage ("Arte/Paredes/08.png")
@@ -41,7 +53,9 @@ function initMundo ()
 
 
     gsala = new Group()
-    
+    gparedes = new Group()
+   // gparedes.overlaps(gcolisor, colide)
+   // gcolisor.overlaps(gparedes, colide)
     let spr
     
     const tsala = 4
@@ -65,23 +79,23 @@ function initMundo ()
                 //canto superior esquerdo
                 if (ax==woffset)
                 {
-                    plotaTile (imgCSE, ax, ay)
+                    plotaTile (imgCSE, ax, ay, true, "CSE")
                     
 
-                    console.log ((ax - woffset)/ttile)
+                    //console.log ((ax - woffset)/ttile)
                 }
                 //canto inferior esquerdo
                 if (ax==tsalapxw)
                 {
-                 plotaTile (imgCSE, ax, ay)
-                    console.log ((ax - woffset)/ttile)
+                 plotaTile (imgCSE, ax, ay, true, "CIE")
+                    //console.log ((ax - woffset)/ttile)
 
                 }
                 
                 //coloca toda a parte superior que faltou
                 if ((ax>woffset) && (ax <tsalapxw))
                 {
-                     plotaTile (imgC, ax, ay)
+                     plotaTile (imgC, ax, ay, true, "C")
                 }
 
             }
@@ -91,17 +105,17 @@ function initMundo ()
                 //canto inferior esquerdo
                 if (ax==woffset)
                 {
-                     plotaTile (imgCSE, ax, ay)
+                     plotaTile (imgCSE, ax, ay, true, "CIE")
                 }
                 //canto inferior direito
                 if (ax==tsalapxw)
                 {
-                    plotaTile (imgCSE, ax, ay)
+                    plotaTile (imgCSE, ax, ay, true,"CID")
                 }
                 //coloca toda a parte superior que faltou
                 if ((ax>woffset) && (ax <tsalapxw))
                 {
-                 plotaTile (imgC, ax, ay)
+                 plotaTile (imgC, ax, ay, true, "B")
                 }
             }
 
@@ -110,14 +124,14 @@ function initMundo ()
                 //parede esquerda
                 if (ax == woffset)
                 {
-                   plotaTile (imgE, ax, ay)
+                   plotaTile (imgE, ax, ay, true, "E")
 
                 }
                 //parede direita
                 if (ax == tsalapxw)
                 {
 
-                  plotaTile (imgE, ax, ay)
+                  plotaTile (imgE, ax, ay, true), "D"
                 }
 
 
@@ -156,29 +170,50 @@ function initMundo ()
 }
 
 
-function plotaTile (imagem, ax, ay)
+function getIndex()
+{
+
+    const tsala = 4
+    const ttile = 64
+    
+    const woffset = personagem.x - ((ttile*tsala)/2)
+    const hoffset = personagem.y - ((ttile*tsala)/2)
+    console.log(woffset+ " "+ hoffset)
+}
+
+
+function plotaTile (imagem, ax, ay, parede = false, nome = "chao")
 {   
     const tsala = 4
     const ttile = 64
     
-
     const woffset = width/2 - ((ttile*tsala)/2)
     const hoffset = height/2 - ((ttile*tsala)/2)
     let spr = new Sprite (imagem);
-
-    spr.overlap (allSprites)
+    spr.static = true
     spr.x = ax+64
     spr.y = ay+64
+    spr.height = 64
+    spr.width = 64
     spr.xx = (ax - woffset)/ttile
     spr.yy = (ay - hoffset)/ttile
-    
-    gsala.push (spr)
-    
+    spr.parede = false
+    spr.nome = nome
+    if (parede){
 
+        spr.parede = true
+        gparedes.push(spr);
+        
+        
+    }
+   
+    gsala.push (spr)
 }
 
 
 function drawMundo ()
 {
+
+    
     gsala.draw()
 }
