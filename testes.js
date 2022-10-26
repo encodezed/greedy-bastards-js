@@ -71,7 +71,7 @@ function mouseClicked()
 CriaSprite(floor(mouse.x/(width/10))*(width/10)+(width/20), floor(mouse.y/(height/10))*(height/10)+(height/20))
 
 
-¼}
+}
 
 function preload ()
 {  
