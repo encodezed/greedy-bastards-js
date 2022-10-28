@@ -140,6 +140,13 @@ function keyReleased()
         case 87:
             sprSelecionado.move ("up")
             break
+        case 72: //h
+            sprSelecionado.mirror.x = !sprSelecionado.mirror.x
+
+            break
+        case 86: //v
+            sprSelecionado.mirror.y = !sprSelecionado.mirror.y
+            break
     }
 
 }
@@ -208,7 +215,6 @@ imgC= loadImage ("Arte/Paredes/02.png")
 player = loadImage("Arte/Sprites/Player/meninagato/0.png")
 goblin = loadImage("Arte/Sprites/Goblin/0 2.png")
 paleta.push(goblin)
-//player.resize (32,32)
 paleta.push (player)
 paleta.push (chaos[0])
 paleta.push (chaos[1])
