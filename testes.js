@@ -113,18 +113,7 @@ function geraGrade()
 function keyReleased()
 {
     switch (keyCode){
-        case 48:
-            imgSelecionada = chaos[0]
-            break        
-        case 49:
-            imgSelecionada = imgE
-            break
-        case 50:
-            imgSelecionada = imgCSE
-            break
-        case 51:
-            imgSelecionada = imgC
-            break
+
         case 68:
             sprSelecionado.rotation += 90
             break
@@ -217,7 +206,8 @@ imgE= loadImage ("Arte/Paredes/14.png")
 imgC= loadImage ("Arte/Paredes/02.png")
 
 player = loadImage("Arte/Sprites/Player/meninagato/0.png")
-
+goblin = loadImage("Arte/Sprites/Goblin/0 2.png")
+paleta.push(goblin)
 //player.resize (32,32)
 paleta.push (player)
 paleta.push (chaos[0])
