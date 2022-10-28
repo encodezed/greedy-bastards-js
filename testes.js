@@ -45,7 +45,7 @@ let sprSelecionado
 
 let tabuleiro = [10]
 let chaos = []
-
+let paleta = []
 function CriaSprite (xx, yy)
 {   
     //console.log ("["+floor(xx/(width/10)) +  "][" +floor(yy/(height/10))+ "]" )
@@ -158,11 +158,25 @@ function keyReleased()
 function mouseClicked()
 {
 
-CriaSprite(mouse.x, mouse.y);
+
+    getItemPaleta()
+
+
+if (!overBox){
+    CriaSprite(mouse.x, mouse.y);
+
+}else{
+
+
+
+
+}
+
 
 
 }
 function mousePressed() {
+
     if (overBox) {
       locked = true;
       fill(150, 122, 158)
@@ -201,7 +215,21 @@ imgCC= loadImage ("Arte/Paredes/08.png")
 imgCSE2= loadImage ("Arte/Paredes/07.png")
 imgE= loadImage ("Arte/Paredes/14.png")
 imgC= loadImage ("Arte/Paredes/02.png")
-    
+
+player = loadImage("Arte/Sprites/Player/meninagato/0.png")
+
+//player.resize (32,32)
+paleta.push (player)
+paleta.push (chaos[0])
+paleta.push (chaos[1])
+paleta.push (chaos[2])
+paleta.push (imgCSE)
+paleta.push(imgCC)
+paleta.push(imgCSE2)
+paleta.push(imgE)
+paleta.push(imgC)
+
+ 
 }
 
 
@@ -234,6 +262,8 @@ function shuffleArray(array) {
 function draw()
 {
 
+ 
+
 
 clear()
 
@@ -243,17 +273,18 @@ camera.zoom = zoomatual;
 
 
 allSprites.draw()
+
 camera.off()
 
-strokeCap(ROUND)
-strokeWeight(5)
+strokeWeight(8)
 
   if (
     mouseX > bx - boxSize &&
     mouseX < bx + boxSize &&
     mouseY > by - boxSize &&
     mouseY < by + boxSize
-  ) {
+  ) {//esta dentro da caixa
+   
     overBox = true;
     if (!locked) {
       stroke(255);
@@ -261,6 +292,7 @@ strokeWeight(5)
       fill(150, 122, 158);
     }
   } else {
+    
     stroke(226, 220, 176);
     fill(122, 122, 158);
     overBox = false;
@@ -272,8 +304,9 @@ strokeWeight(5)
   push()
   noStroke()
   fill (0,20)
-  rect(bx+10, by+10, boxSize, boxSize);
+  rect(bx+9, by+11, boxSize, boxSize);
   pop ()
+  strokeCap(ROUND)
   rect(bx, by, boxSize, boxSize);
   noStroke()
   fill (10)
@@ -284,32 +317,101 @@ strokeWeight(5)
 
   text ("Paleta de Tiles", bx, by-74)
   
-  image(chaos[0], bx-120, by -40,50,50)
-  image(chaos[1], bx-60, by -40,50,50)
-  image(chaos[2], bx, by -40,50,50)
-  image(imgC, bx+60, by -40,50,50)
-
-  image(imgCSE, bx-120, by +20,50,50)
-  image(imgCC, bx-60, by +20,50,50)
-  image(imgC, bx, by +20,50,50)
-  image(imgE, bx+60, by +20,50,50)
+  //apertou no primeiro quadrado
 
 
-  image(imgCSE2, bx-120, by +80,50,50)
-  image(chaos[1], bx-60, by +80,50,50)
-  image(chaos[2], bx, by +80,50,50)
-  image(chaos[2], bx+60, by +80,50,50)
+fill (255,0,0)
+
+plotaPaleta()
+  
+}
+
+//i = pagina 
+function plotaPaleta(i = 0, ncolunas = 4){
+    xini =bx-133
+    xxx = xini
+    yini =by-65 
+    yyy = yini
+    vspc = 67
+    hspc = 67
+
+    xxxr = bx -95
+    yyyr = by - 15
+    
+    ii = 0
 
 
+    for (item of paleta)
+    {
+
+        if (ii == ncolunas)
+        {
+            yyy += vspc 
+            xxx = xini
+            ii = 0
+
+        }
+
+        image(item, xxx,yyy)
+
+        xxx += hspc
+        
+        ii++
+
+   
+    }
 
 
-//allSprites.draw();
+}
 
-//o codigo abaixo possibilita vc mudar de cor apenas um pedaço do personagem
-//tint (200,10,10)
-//personagem.corpo.cabeca.draw()
+function getItemPaleta (ncolunas = 4){
 
-//personagem.corpo.bracoesquerdo.rotation = rotation
+
+    xini =bx-133
+    xxx = xini
+    yini =by-65 
+    yyy = yini
+    vspc = 67
+    hspc = 67
+
+    xxxr = bx -95
+    yyyr = by - 15
+    
+    ii = 0
+    ipaleta = 0
+
+    for (item of paleta)
+    {
+
+        if (ii == ncolunas)
+        {
+            yyy += vspc 
+            xxx = xini
+            ii = 0
+
+        }
+
+        if(
+            mouseX > xxx &&
+            mouseX < xxx +vspc &&
+            mouseY > yyy &&
+            mouseY < yyy + hspc
+            )
+            {
+                console.log("voce selecionou o item "+ ipaleta)
+                imgSelecionada = paleta[ipaleta]
+                return
+
+            }
+
+        xxx += hspc
+        
+        ii++
+        ipaleta ++
+   
+    }
+
+
 
 }
 
