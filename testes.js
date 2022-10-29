@@ -46,11 +46,12 @@ let sprSelecionado
 let tabuleiro = [10]
 let chaos = []
 let paleta = []
+let mapa = []
 function CriaSprite (xx, yy)
 {   
     //console.log ("["+floor(xx/(width/10)) +  "][" +floor(yy/(height/10))+ "]" )
-    xx =  floor(xx/(width/10))*(width/10)+(width/20) 
-    yy= floor(yy/(height/10))*(height/10)+(height/20)
+    xx =  floor(xx/(width/10))*(width/10)
+    yy= floor(yy/(height/10))*(height/10)
     let spr = new Sprite(xx, yy, width/10,height/10)
     
     spr.tileSize = width/10
@@ -66,11 +67,12 @@ function CriaSprite (xx, yy)
 
         spr.addAni (imgSelecionada)
     }
+
     spr.scale = 1.25
     spr.overlap (allSprites)
     sprSelecionado= spr
-  //  spr.move ('up')
-    gspr.push (spr)
+    return (spr)
+    
 }
 
 function geraGrade()
@@ -83,16 +85,14 @@ function geraGrade()
         for (yy = 0; yy <linhas; yy++)
         {
             tabuleiro[xx] = [yy];
-            tabuleiro[xx][yy] = { 
-                                    x:xx*(width/colunas),
-                                    y:yy*(height/linhas)
-            }
+            imgSelecionada = chaos[0]
+            tabuleiro[xx][yy] = CriaSprite (xx * (width/colunas),yy * (height/linhas))
+            tabuleiro[xx][yy].overlap (allSprites)
             //linhas
            // line (0,yy*(height/linhas), width,yy*(height/linhas) )
             //meio
 
-            imgSelecionada = chaos[0]
-            CriaSprite (xx * (width/colunas), yy * (height/linhas))
+           
             //point(xx*(width/colunas)+(width/10)/2, yy * (height/linhas)+ (height/10)/2)
             
             //colunas
