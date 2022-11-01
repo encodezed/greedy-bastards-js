@@ -14,7 +14,8 @@ tipos = {
             CHAO:1,
             PLAYER:2,
             INIMIGO:3,
-            ITEM:4
+            ITEM:4,
+            VAZIO:666
  }
 
 selecao = {
@@ -30,8 +31,10 @@ celula = {
     scale:0.0,
     xmirror:false,
     ymirror:false,
-    x : 0.0,
-    y : 0.0,
+    x : 0,
+    y : 0,
+    xi:0,
+    yi:0,
     tipo: tipos.CHAO //parede inimigo item
 }
 
@@ -89,9 +92,6 @@ var mapa        = []
  * 
  */
 
-
-
-
 function preload ()
 {  
 
@@ -121,8 +121,8 @@ Jogador.tipo = tipos.PLAYER
 /**
  * inicializa a variavel paleta com 2 variaveis, imagem e tipo 
  */
-paleta.push({img:goblin,tipo: tipos.CHAO})
-paleta.push ({img:player,tipo: tipos.PLAYER })
+paleta.push({img:goblin,tipo:tipos.INIMIGO})
+paleta.push ({img:player,tipo:tipos.PLAYER})
 paleta.push ({img:chaos[0],tipo:tipos.CHAO})
 paleta.push ({img:chaos[1],tipo:tipos.CHAO})
 paleta.push ({img:chaos[2],tipo:tipos.CHAO})
@@ -137,10 +137,12 @@ paleta.push({img:imgC,tipo:tipos.PAREDE})
  * mudar para usar uma 
  * 
  */
+ 
 fill2DimensionsArray(tabuleiro,tamanhotabuleiro,tamanhotabuleiro) //inicializa a array que é o chao
 fill2DimensionsArray(tabuleirox,tamanhotabuleiro,tamanhotabuleiro)
-fill2DimensionsArray(inimigos,tamanhotabuleiro,tamanhotabuleiro) //inicializa tabuleiro dos inimigos
+//fill2DimensionsArray(inimigos,tamanhotabuleiro,tamanhotabuleiro) //inicializa tabuleiro dos inimigos
 fill2DimensionsArray(paredes,tamanhotabuleiro,tamanhotabuleiro) //inicializa tabuleiro das paredes
+
 
 }
 
@@ -209,17 +211,93 @@ function CriaSprite (xx, yy)
    
     xx     =floor(xx/(width/10))*(width/10)+(width/20)  //localização na tela
     yy     =floor(yy/(height/10))*(height/10)+(height/20) //localização na tela
-    
+
+
+/**
+ * se for do tipo item
+ */
+
+if (selecao.tipo === tipos.ITEM)
+{
+
+}
+
+ /**
+ * se for do tipo CHAO
+ */
+
+    if (selecao.tipo === tipos.CHAO)
+    {
+        if (paredes[xi][yi].tipo == tipos.PAREDE){
+
+            paredes[xi][yi].tipo = tipos.VAZIO
+
+        }
+
+    }
+
+ /**
+ * Se for do tipo INIMIGO
+ */   
+    if (selecao.tipo === tipos.INIMIGO)
+    {
+       for (inimigo of inimigos )
+       {
+            if (
+                inimigo.xi == xi &&
+                inimigo.yi == yi
+            )
+            {
+                console.log ("ja tem outro inimigo")
+                return
+                
+            }
+       }
+       if (
+            Jogador.xi == xi &&
+            Jogador.yi == yi
+       ){
+            console.log ("o jogador esta ai")
+            return
+
+       }
+        var ini = inimigos.push(structuredClone(celula))
+        
+        inimigos[ini-1].x = xx
+        inimigos[ini-1].y = yy
+        inimigos[ini-1].xi = xi
+        inimigos[ini-1].yi = yi
+    }
+/**
+ * se for do tipo PLAYER
+ */
     if (selecao.tipo === tipos.PLAYER)
     {
+        if (paredes[xi][yi].tipo == tipos.PAREDE)
+        {
+            console.log("tem uma parede ai")
+            return
+
+        }
         Jogador.x = xx
         Jogador.y = yy
+        Jogador.xi = xi
+        Jogador.yi = yi
         Jogador.ipaleta = selecao.ipaleta
         Jogador.tipo = tipos.PLAYER
     }
+/**
+ * se for do tipo PAREDE
+ */
 
     if (selecao.tipo === tipos.PAREDE)
     {
+        if (paredes[xi][yi].tipo == tipos.PAREDE)
+        {
+            console.log("ja tinha uma parede ai")
+
+
+        }
         paredes[xi][yi].ipaleta = selecao.ipaleta
         paredes[xi][yi].tipo = tipos.PAREDE
         paredes[xi][yi].scale = 1.25
@@ -228,7 +306,6 @@ function CriaSprite (xx, yy)
 
     if (!inicializa)
     {
-        //console.table (paredes[xi][yi])
         if (tabuleiro[xi][yi].tipo == selecao.tipo)
         {   
                 tabuleiro[xi][yi].remove()
