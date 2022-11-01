@@ -7,16 +7,75 @@ TODOS:
 */
 
 /**
- * objetos 
+ * globais 
  */
+ let tamanhocelula = 64
+ let tamanhotabuleiro = 10
+ let inicializa  = true
+ let zoomatual   = 2.2
+ let sprSelecionado
+ var tabuleiro   = []
+ var inimigos    = []
+ var itens       = []   
+ var paredes     = []
+ var tabuleirox  = []
+ var chaos       = []
+ var paleta      = []
+ var mapa        = []
+
+/**
+ * ENUMS 
+ */
+ let n=0
+movimentos = {
+            CIMA: n++,
+            BAIXO: n++,
+            ESQUERDA: n++,
+            DIREITA:n++
+}
+n=0
 tipos = {
-            PAREDE:0,
-            CHAO:1,
-            PLAYER:2,
-            INIMIGO:3,
-            ITEM:4,
-            VAZIO:666
+            PAREDE:n++,
+            CHAO:n++,
+            DECORACAO:n++,
+            PLAYER:n++,
+            INIMIGO:n++,
+            ITEM:n++,
+            VAZIO:n++,
+            ARMA:n++,
+            ESCUDO:n++,
+            EFEITO:n++,
+            MAGIA:n++,
+            POCAO:n++
  }
+ n=0
+tipoitem = {
+            ESCUDODEMADEIRA:n++,
+            ESCUDOFERRO:n++,
+            ESCUDOACO:n++,
+            ESPADACURTA:n++,
+            ESPADALONGA:n++,
+            MACHADO:n++,
+            POCAOVIDA:n++,
+            FACA:n++,
+            BAU:n++,
+            NADA:n++
+}
+//console.log(tipoitem)
+/**
+ * OBJETOS
+ */
+item = {
+                min:1, //minimo def, ataque, life steal, recuperacao vida sei la
+                max:2, //mesma logica
+                ipaleta:0, //qual é imagem que simboliza ela
+                nome:"item",
+                tipo:tipos.ARMA,
+                tipoitem:tipoitem.ESCUDODEMADEIRA,
+                img:0,
+                historia:""
+       }
+
 
 selecao = {
             ipaleta:0,
@@ -25,20 +84,25 @@ selecao = {
             tipo:tipos.CHAO //parede chao player
 }
 
-celula = {
+entidade = {
     ipaleta :  3, //indice da imagem na paleta[i]
     rotation : 0,
     scale:0.0,
     xmirror:false,
     ymirror:false,
-    x : 0,
+    x : 0,//posicao na tela
     y : 0,
-    xi:0,
+    xi:0,//posiçao na tabela
     yi:0,
-    tipo: tipos.CHAO //parede inimigo item
+    tipo: tipos.CHAO, //parede inimigo item
+    vida:5,
+    velocidade : tamanhocelula * 1,
+    maoesquerda : 0,
+    maodireita :0,
+    nome: "ENTIDADE"
 }
 
-var Jogador = structuredClone(celula)
+var Jogador = structuredClone(entidade) //inicializa entidade jogador
 
 /**
  * variaveis da paleta
@@ -70,21 +134,32 @@ let imgchao
 let imgSelecionada
 
 
-/**
- * globais 
- */
+function criaItem (nome, tipo,tipoitem,min,max, img, historia = ""){
 
-let tamanhotabuleiro = 10
-let inicializa  = true
-let zoomatual   = 2.2
-let sprSelecionado
-var tabuleiro   = []
-var inimigos    = []
-var paredes     = []
-var tabuleirox  = []
-var chaos       = []
-var paleta      = []
-var mapa        = []
+    let i = itens.push ( structuredClone(item))
+    itens[i-1].tipoitem = tipoitem
+    itens[i-1].min = min
+    itens[i-1].max = max
+    itens[i-1].tipo = tipo 
+    itens[i-1].nome = nome
+    itens[i-1].img = img
+    itens[i-1].historia = historia
+
+    if (
+        tipo == tipos.ARMA ||
+        tipo == tipos.ESCUDO ||
+        tipo == tipos.POCAO
+    )
+    {
+        paleta.push({
+         img:img,
+         tipo:tipo
+        })
+    }
+
+
+}
+
 
 /**
  * estava olhando a lista de inimigos, que serão um array 1D 
@@ -100,6 +175,10 @@ function preload ()
  * chao como tem variacoes usa uma array
  * o mesmo sera feito com paredes etc... o que muda é o tipo
  */
+longa =  loadImage("Arte/Sprites/Item/Longa2.png")
+pocaovida =  loadImage("Arte/Sprites/Item/PocaoVida.png")
+escudo =  loadImage("Arte/Sprites/Item/EscudoSimples.png")
+
 imgchao = loadImage ("Arte/Paredes/15.png")
 chaos.push (imgchao)
 imgchao = loadImage ("Arte/Paredes/16.png")
@@ -118,6 +197,10 @@ goblin = loadImage("Arte/Sprites/Goblin/0 2.png")
 
 Jogador.tipo = tipos.PLAYER
 
+
+
+console.table(itens)
+
 /**
  * inicializa a variavel paleta com 2 variaveis, imagem e tipo 
  */
@@ -131,6 +214,11 @@ paleta.push({img:imgCC,tipo:tipos.PAREDE})
 paleta.push({img:imgCSE2,tipo:tipos.PAREDE})
 paleta.push({img:imgE,tipo:tipos.PAREDE})
 paleta.push({img:imgC,tipo:tipos.PAREDE})
+
+criaItem ("Espada Longa do Poder",tipos.ARMA,tipoitem.ESPADALONGA,1,2,longa,"Criada pelo beyonder")
+criaItem ("Escudo simples",tipos.ESCUDO,tipoitem.ESCUDODEMADEIRA,1,2,escudo,"Escudo Simples")
+criaItem ("Pocao de vida",tipos.POCAO,tipoitem.POCAOVIDA,1,2,pocaovida,"Pocao de vida")
+
 
 /**
  * aqui inicializa as arrays usadas para o tabuleiro, uma para salvar outra para uso
@@ -189,10 +277,10 @@ function draw()
     push()
     noStroke()
     fill (0,20)
-    rect(bx+9, by+11, boxSize, boxSize);
+    rect(bx+9, by+11+80, boxSize, boxSize+80);
     pop ()
     strokeCap(ROUND)
-    rect(bx, by, boxSize, boxSize);
+    rect(bx, by+80, boxSize, boxSize+80);
     noStroke()
     fill (10)
     textSize(17)
@@ -203,14 +291,24 @@ function draw()
     plotaPaleta()
 }
 
-function CriaSprite (xx, yy)
+function RemoveSprite (xx, yy)
+{
+
+
+}
+/**
+ * cria celula 
+ * TODO.
+ * mudar isso para criaCelula
+ */
+function CriaSprite (xx, yy, escala = 1.25)
 {   
 
-    let xi =floor(xx/(width/10)) //indicex
-    let yi =floor(yy/(height/10))//indice y
+    let xi =floor(xx/(width/tamanhotabuleiro)) //indicex
+    let yi =floor(yy/(height/tamanhotabuleiro))//indice y
    
-    xx     =floor(xx/(width/10))*(width/10)+(width/20)  //localização na tela
-    yy     =floor(yy/(height/10))*(height/10)+(height/20) //localização na tela
+    xx     =floor(xx/(width/tamanhotabuleiro))*(width/tamanhotabuleiro)+(width/(tamanhotabuleiro*2))  //localização na tela
+    yy     =floor(yy/(height/tamanhotabuleiro))*(height/tamanhotabuleiro)+(height/(tamanhotabuleiro*2)) //localização na tela
 
 
 /**
@@ -219,6 +317,11 @@ function CriaSprite (xx, yy)
 
 if (selecao.tipo === tipos.ITEM)
 {
+
+        /**
+         * precisa fazer
+         */
+
 
 }
 
@@ -261,7 +364,7 @@ if (selecao.tipo === tipos.ITEM)
             return
 
        }
-        var ini = inimigos.push(structuredClone(celula))
+        var ini = inimigos.push(structuredClone(entidade))
         
         inimigos[ini-1].x = xx
         inimigos[ini-1].y = yy
@@ -300,7 +403,7 @@ if (selecao.tipo === tipos.ITEM)
         }
         paredes[xi][yi].ipaleta = selecao.ipaleta
         paredes[xi][yi].tipo = tipos.PAREDE
-        paredes[xi][yi].scale = 1.25
+        paredes[xi][yi].scale = escala
         paredes[xi][yi].rotation = 0     
     }
 
@@ -313,11 +416,11 @@ if (selecao.tipo === tipos.ITEM)
         }
     }
    
-    tabuleiro[xi][yi] = new Sprite(xx, yy, width/10,height/10)
+    tabuleiro[xi][yi] = new Sprite(xx, yy, width/tamanhotabuleiro,height/tamanhotabuleiro)
     tabuleiro[xi][yi].overlap (allSprites)
-    tabuleiro[xi][yi].tileSize = width/10
-    tabuleirox[xi][yi].scale = 1.25
-    tabuleiro[xi][yi].scale = 1.25
+    tabuleiro[xi][yi].tileSize = width/tamanhotabuleiro
+    tabuleirox[xi][yi].scale = escala
+    tabuleiro[xi][yi].scale = escala
 
     if (inicializa)
     {
@@ -329,7 +432,7 @@ if (selecao.tipo === tipos.ITEM)
         tabuleirox[xi][yi].rotation = rnum
     }else{
 
-       // console.table (paredes[xi])
+       
         tabuleiro[xi][yi].addAni (selecao.img)
     }
 
@@ -338,8 +441,8 @@ if (selecao.tipo === tipos.ITEM)
 
 function geraGrade()
 {
-    const linhas = 10
-    const colunas = 10
+    const linhas = tamanhotabuleiro
+    const colunas = tamanhotabuleiro
 
     for (xx = 0; xx < colunas;xx ++ )
     {
@@ -358,7 +461,7 @@ function criaGrade()
              //linhas
             line (0,yy*(height/linhas), width,yy*(height/linhas) )
             //meio
-            point(xx*(width/colunas)+(width/10)/2, yy * (height/linhas)+ (height/10)/2)
+            point(xx*(width/colunas)+(width/tamanhotabuleiro)/2, yy * (height/linhas)+ (height/tamanhotabuleiro)/2)
             //colunas
             line ( xx * (width/colunas), 0 , xx * (width/colunas), height )
 }
@@ -367,8 +470,9 @@ function keyReleased()
 {
     switch (keyCode){
 
-        case 68:
+        case 82:
             selecao.spr.rotation += 90
+
             break
         case 189:
             zoomatual -= 0.5
@@ -393,10 +497,13 @@ function keyReleased()
             selecao.spr.move ("up") //w
             break
         case 72: //h
+        //atualizar
             selecao.spr.mirror.x = !selecao.spr.mirror.x
 
             break
         case 86: //v
+
+            //atualizar
             selecao.spr.mirror.y = !selecao.spr.mirror.y
             break
     }
@@ -443,7 +550,7 @@ function fill2DimensionsArray(arr, rows, columns){
     for (var i = 0; i < rows; i++) {
         arr.push([0])
         for (var j = 0; j < columns; j++) {
-            arr[i][j] = structuredClone(celula);
+            arr[i][j] = structuredClone(entidade);
         }
     }
 }

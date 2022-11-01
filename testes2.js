@@ -15,7 +15,7 @@ let selecao = {
     tipo:tipos.CHAO //parede chao player
 }
 
-let celula = {
+let entidade = {
 ipaleta :  3, //indice da imagem na paleta[i]
 rotation : 0.0,
 scale:0.0,
@@ -57,7 +57,7 @@ function fill2DimensionsArray(arr, rows, columns){
     for (var i = 0; i < rows; i++) {
         arr.push([0])
         for (var j = 0; j < columns; j++) {
-            arr[i][j] = structuredClone(celula);
+            arr[i][j] = structuredClone(entidade);
         }
     }
 }
