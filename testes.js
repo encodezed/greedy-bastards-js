@@ -102,7 +102,8 @@ entidade = {
     velocidade : tamanhocelula * 1,
     maoesquerda : 0,
     maodireita :0,
-    nome: "ENTIDADE"
+    nome: "ENTIDADE",
+    spr: 0
 }
 
 var Jogador = structuredClone(entidade) //inicializa entidade jogador
@@ -248,6 +249,7 @@ function setup()
     by = 150.0; //coisas de paleta
     rectMode(RADIUS);
     strokeWeight(2);    
+    
 }
 
 function draw()
@@ -312,7 +314,7 @@ function CriaSprite (xx, yy, escala = 1.25)
    
     xx     =floor(xx/(width/tamanhotabuleiro))*(width/tamanhotabuleiro)+(width/(tamanhotabuleiro*2))  //localização na tela
     yy     =floor(yy/(height/tamanhotabuleiro))*(height/tamanhotabuleiro)+(height/(tamanhotabuleiro*2)) //localização na tela
-
+    tabuleiro[xi][yi] = new Sprite(xx, yy, width/tamanhotabuleiro,height/tamanhotabuleiro)
 
 /**
  * se for do tipo item
@@ -355,6 +357,7 @@ if (selecao.tipo === tipos.ITEM)
             )
             {
                 console.log ("ja tem outro inimigo")
+                tabuleiro[xi][yi].remove()
                 return
                 
             }
@@ -363,6 +366,7 @@ if (selecao.tipo === tipos.ITEM)
             Jogador.xi == xi &&
             Jogador.yi == yi
        ){
+         tabuleiro[xi][yi].remove()
             console.log ("o jogador esta ai")
             return
 
@@ -379,10 +383,19 @@ if (selecao.tipo === tipos.ITEM)
  */
     if (selecao.tipo === tipos.PLAYER)
     {
+      
+
         if (paredes[xi][yi].tipo == tipos.PAREDE)
         {
             console.log("tem uma parede ai")
+            tabuleiro[xi][yi].remove()
             return
+
+        }
+        //tabuleiro[xi][yi].remove()
+        if (Jogador.spr != 0 )
+        {
+            Jogador.spr.remove()
 
         }
         Jogador.x = xx
@@ -391,6 +404,8 @@ if (selecao.tipo === tipos.ITEM)
         Jogador.yi = yi
         Jogador.ipaleta = selecao.ipaleta
         Jogador.tipo = tipos.PLAYER
+        Jogador.spr = tabuleiro[xi][yi]
+
     }
 /**
  * se for do tipo PAREDE
@@ -400,6 +415,7 @@ if (selecao.tipo === tipos.ITEM)
     {
         if (paredes[xi][yi].tipo == tipos.PAREDE)
         {
+            tabuleiro[xi][yi].remove()
             console.log("ja tinha uma parede ai")
 
 
@@ -419,7 +435,7 @@ if (selecao.tipo === tipos.ITEM)
         }
     }
    
-    tabuleiro[xi][yi] = new Sprite(xx, yy, width/tamanhotabuleiro,height/tamanhotabuleiro)
+   
     tabuleiro[xi][yi].overlap (allSprites)
     tabuleiro[xi][yi].tileSize = width/tamanhotabuleiro
     tabuleirox[xi][yi].scale = escala
@@ -435,7 +451,6 @@ if (selecao.tipo === tipos.ITEM)
         tabuleirox[xi][yi].rotation = rnum
     }else{
 
-       
         tabuleiro[xi][yi].addAni (selecao.img)
     }
 
