@@ -15,7 +15,7 @@ TODOS:
  let tamanhocelula = 64
  let tamanhotabuleiro = 10
  let inicializa  = true
- let zoomatual   = 2.2
+ let zoomatual   = 1.2
  let sprSelecionado
  var tabuleiro   = []
  var inimigos    = []
