@@ -264,8 +264,8 @@ function draw()
     if (
         mouseX > bx - boxSize &&
         mouseX < bx + boxSize &&
-        mouseY > by - boxSize &&
-        mouseY < by + boxSize
+        mouseY > by - boxSize+160 &&
+        mouseY < by + boxSize+160
     ) {//esta dentro da caixa
         overBox = true;
         if (!locked) 
@@ -286,13 +286,20 @@ function draw()
     pop ()
     strokeCap(ROUND)
     rect(bx, by+80, boxSize, boxSize+80);
+    text ("espelharh", bx-90,by+250)
+    text ("rodar", bx,by+250)
+    text ("espelharv", bx+90,by+250)
     noStroke()
     fill (10)
     textSize(17)
     textAlign(CENTER)
-    text ("BG mapeador - @ZeDnaked", bx, by-100)
-    text ("Paleta de Tiles", bx, by-74)   
-    fill (255,0,0)
+    
+    
+    text ("Greedy Bastars - CatGirls Tail - maptool v0.5 - @zednaked",width/2,20)
+  
+    text ("Paleta de Tiles", bx, by-100)   
+  
+    fill (255,0,0,100)
     plotaPaleta()
 }
 
@@ -534,8 +541,49 @@ function mouseClicked()
 
     if (!overBox){
         CriaSprite(mouse.x, mouse.y);
+    }else{
+        
+        if (
+                mouseX > bx-110 &&
+                mouseX < bx-70 &&
+                mouseY > by+240 &&
+                mouseY < by+260 
+         )
+        {
+            selecao.spr.mirror.x = !selecao.spr.mirror.x
+            console.log("espelhah")
+        }
+
+        if (
+            mouseX > bx-15 &&
+            mouseX < bx+15 &&
+            mouseY > by+240 &&
+            mouseY < by+260 
+           )
+        {
+            selecao.spr.rotation += 90
+            console.log("roda")
+        }
+
+        if (
+            mouseX > bx+90-15 &&
+            mouseX < bx+90+15 &&
+            mouseY > by+240 &&
+            mouseY < by+260 
+           )
+        {
+            selecao.spr.mirror.y = !selecao.spr.mirror.y
+            console.log("espelhav")
+        }
+
+
+     //   text ("espelharh", bx-90,by+250)
+    //text ("rodar", bx,by+250)
+    //text ("espelharv", bx+90,by+250)
 
     }
+
+
 }
 
 function mousePressed() 
