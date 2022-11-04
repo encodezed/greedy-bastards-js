@@ -12,6 +12,7 @@ TODOS:
 /**
  * globais 
  */
+let mostrapaleta =  true
  let tamanhocelula = 64
  let tamanhotabuleiro = 10
  let inicializa  = true
@@ -19,7 +20,8 @@ TODOS:
  let sprSelecionado
  var tabuleiro   = []
  var inimigos    = []
- var itens       = []   
+ var itens       = [] // isso é a lista de itens tipo a paleta só que de itens
+ var itensnomapa = []   
  var paredes     = []
  var tabuleirox  = []
  var chaos       = []
@@ -64,7 +66,7 @@ tipoitem = {
             BAU:n++,
             NADA:n++
 }
-//console.log(tipoitem)
+
 /**
  * OBJETOS
  */
@@ -73,7 +75,7 @@ item = {
                 max:2, //mesma logica
                 ipaleta:0, //qual é imagem que simboliza ela
                 nome:"item",
-                tipo:tipos.ARMA,
+                tipo:tipos.ITEM,
                 tipoitem:tipoitem.ESCUDODEMADEIRA,
                 img:0,
                 historia:""
@@ -84,8 +86,9 @@ selecao = {
             ipaleta:0,
             spr:0,
             img:0,
-            tipo:tipos.CHAO //parede chao player
-}
+            tipo:tipos.CHAO, //parede chao player
+            entidade:0
+        }
 
 entidade = {
     ipaleta :  3, //indice da imagem na paleta[i]
@@ -103,6 +106,8 @@ entidade = {
     maoesquerda : 0,
     maodireita :0,
     nome: "ENTIDADE",
+    item: 0,
+    inimigo:0,
     spr: 0
 }
 
@@ -149,15 +154,12 @@ function criaItem (nome, tipo,tipoitem,min,max, img, historia = ""){
     itens[i-1].img = img
     itens[i-1].historia = historia
 
-    if (
-        tipo == tipos.ARMA ||
-        tipo == tipos.ESCUDO ||
-        tipo == tipos.POCAO
-    )
+    if (tipo === tipos.ITEM)
     {
         paleta.push({
          img:img,
-         tipo:tipo
+         tipo:tipo,
+         item:itens[i-1]
         })
     }
 
@@ -214,14 +216,14 @@ paleta.push ({img:chaos[0],tipo:tipos.CHAO})
 paleta.push ({img:chaos[1],tipo:tipos.CHAO})
 paleta.push ({img:chaos[2],tipo:tipos.CHAO})
 paleta.push ({img:imgCSE, tipo:tipos.PAREDE})
-paleta.push({img:imgCC,tipo:tipos.PAREDE})
+paleta.push({img:imgCC,tipo:tipos.CHAO})
 paleta.push({img:imgCSE2,tipo:tipos.PAREDE})
 paleta.push({img:imgE,tipo:tipos.PAREDE})
 paleta.push({img:imgC,tipo:tipos.PAREDE})
 
-criaItem ("Espada Longa do Poder",tipos.ARMA,tipoitem.ESPADALONGA,1,2,longa,"Criada pelo beyonder")
-criaItem ("Escudo simples",tipos.ESCUDO,tipoitem.ESCUDODEMADEIRA,1,2,escudo,"Escudo Simples")
-criaItem ("Pocao de vida",tipos.POCAO,tipoitem.POCAOVIDA,1,2,pocaovida,"Pocao de vida")
+criaItem ("Espada Longa do Poder",tipos.ITEM,tipoitem.ESPADALONGA,1,2,longa,"Criada pelo beyonder")
+criaItem ("Escudo simples",tipos.ITEM,tipoitem.ESCUDODEMADEIRA,1,2,escudo,"Escudo Simples")
+criaItem ("Pocao de vida",tipos.ITEM,tipoitem.POCAOVIDA,1,2,pocaovida,"Pocao de vida")
 
 
 /**
@@ -260,24 +262,50 @@ function draw()
     allSprites.draw()
     camera.off() //desliga acamera para fazer a ui
     strokeWeight(8)
-
-    if (
-        mouseX > bx - boxSize &&
-        mouseX < bx + boxSize &&
-        mouseY > by - boxSize+160 &&
-        mouseY < by + boxSize+160
-    ) {//esta dentro da caixa
-        overBox = true;
-        if (!locked) 
-        {
-            stroke(255);
-            fill(150, 122, 158);
-        }
-    }else{
-        stroke(226, 220, 176);
-        fill(122, 122, 158);
-        overBox = false;
+    if (mostrapaleta){
+        
+        drawPaleta()
     }
+    fill (20,22,26)
+    text ("Greedy Bastars - CatGirls Tail - maptool v0.5 - @zednaked",width/2,20)
+}
+
+
+function mapeiaMouse()
+{
+    if (mostrapaleta)
+    {
+        if (
+            mouseX > bx - boxSize &&
+            mouseX < bx + boxSize &&
+            mouseY > (by-160 ) - (boxSize-160) &&
+            mouseY < (by +160) + (boxSize)
+        ) {//esta dentro da caixa
+            overBox = true;
+            if (!locked) 
+            {
+                stroke(255);
+                fill(150, 122, 158);
+            }
+        }else{
+            stroke(226, 220, 176);
+            fill(122, 122, 158);
+            overBox = false;
+        }
+    }
+}
+
+
+
+/**
+ * CONVERTER ISSO PARA UMA FUNCAO QUE CRIA PAINEIS
+ * 
+ */
+function drawPaleta()
+{
+
+
+  mapeiaMouse()
 
     push()
     noStroke()
@@ -286,6 +314,32 @@ function draw()
     pop ()
     strokeCap(ROUND)
     rect(bx, by+80, boxSize, boxSize+80);
+
+
+    /**
+     * MUDAR AQUI PARA APARECER COISAS DIFERENTES DEPENDENDO
+     * DO QUE ESTIVER SELECIONADO !!!!
+     *FOCO AQUI
+     * 
+     */
+
+    if (selecao.item)
+    {
+
+        text ("nome:", bx-90,by+250-30)
+        text (selecao.item.nome, bx,by+250-30)
+        text ("", bx+90,by+250-30)
+    }else{
+    
+        if (selecao.entidade){
+
+        // console.log("vrau")
+        text (selecao.entidade.nome, bx-90,by+250-30)
+        text ("", bx,by+250-30)
+        text ("", bx+90,by+250-30)
+        }
+    }
+
     text ("espelharh", bx-90,by+250)
     text ("rodar", bx,by+250)
     text ("espelharv", bx+90,by+250)
@@ -295,15 +349,16 @@ function draw()
     textAlign(CENTER)
     
     
-    text ("Greedy Bastars - CatGirls Tail - maptool v0.5 - @zednaked",width/2,20)
+ 
   
     text ("Paleta de Tiles", bx, by-100)   
   
     fill (255,0,0,100)
     plotaPaleta()
+
 }
 
-function RemoveSprite (xx, yy)
+function removeEntidade (xx, yy)
 {
 
 
@@ -311,9 +366,9 @@ function RemoveSprite (xx, yy)
 /**
  * cria celula 
  * TODO.
- * mudar isso para criaCelula
+ * mudar isso para criaEntidade
  */
-function CriaSprite (xx, yy, escala = 1.25)
+function criaEntidade (xx, yy, escala = 1.25)
 {   
 
     let xi =floor(xx/(width/tamanhotabuleiro)) //indicex
@@ -327,13 +382,27 @@ function CriaSprite (xx, yy, escala = 1.25)
  * se for do tipo item
  */
 
+//console.log (selecao.tipo)
 if (selecao.tipo === tipos.ITEM)
 {
+    console.log ("criou item")
 
-        /**
-         * precisa fazer
-         */
+     /**
+     * precisa fazer
+     */
+    var ini = itensnomapa.push(structuredClone(entidade))
+        
+    itensnomapa[ini-1].x = xx
+    itensnomapa[ini-1].y = yy
+    itensnomapa[ini-1].xi = xi
+    itensnomapa[ini-1].yi = yi
+    itensnomapa[ini-1].tipo = selecao.tipo
+    itensnomapa[ini-1].item = selecao.item
+     //esse nome tem q ter em algum lugar
+    itensnomapa[ini-1].nome =  selecao.item.nome    
+    selecao.entidade = itensnomapa[ini-1]
 
+    console.table(itensnomapa)
 
 }
 
@@ -345,7 +414,8 @@ if (selecao.tipo === tipos.ITEM)
     {
         if (paredes[xi][yi].tipo == tipos.PAREDE){
 
-            paredes[xi][yi].tipo = tipos.VAZIO
+            paredes[xi][yi].tipo = tipos.CHAO
+            paredes[xi][yi].nome = "chao:"+xi+"x"+yi
 
         }
 
@@ -368,6 +438,7 @@ if (selecao.tipo === tipos.ITEM)
                 return
                 
             }
+            
        }
        if (
             Jogador.xi == xi &&
@@ -384,6 +455,10 @@ if (selecao.tipo === tipos.ITEM)
         inimigos[ini-1].y = yy
         inimigos[ini-1].xi = xi
         inimigos[ini-1].yi = yi
+        //esse nome tem q ter em algum lugar
+        inimigos[ini-1].nome = "Goblinzitus:"+xi+"x"+yi
+        console.table(inimigos)
+
     }
 /**
  * se for do tipo PLAYER
@@ -412,7 +487,8 @@ if (selecao.tipo === tipos.ITEM)
         Jogador.ipaleta = selecao.ipaleta
         Jogador.tipo = tipos.PLAYER
         Jogador.spr = tabuleiro[xi][yi]
-
+        Jogador.nome = "Menina Gato"
+        console.table(Jogador)
     }
 /**
  * se for do tipo PAREDE
@@ -431,6 +507,7 @@ if (selecao.tipo === tipos.ITEM)
         paredes[xi][yi].tipo = tipos.PAREDE
         paredes[xi][yi].scale = escala
         paredes[xi][yi].rotation = 0     
+        paredes[xi][yi].nome = "Parede:"+xi+"x"+yi
     }
 
     if (!inicializa)
@@ -464,85 +541,23 @@ if (selecao.tipo === tipos.ITEM)
     selecao.spr = tabuleiro[xi][yi]
 }
 
-function geraGrade()
-{
-    const linhas = tamanhotabuleiro
-    const colunas = tamanhotabuleiro
 
-    for (xx = 0; xx < colunas;xx ++ )
-    {
-        for (yy = 0; yy <linhas; yy++)
-        {    
-           selecao.img = paleta[rolaDado(2,5)].img
-           CriaSprite (xx * (width/colunas),yy * (height/linhas))
-        }  
-    }
-    inicializa = false
-}
 
-function criaGrade()
-{
-
-             //linhas
-            line (0,yy*(height/linhas), width,yy*(height/linhas) )
-            //meio
-            point(xx*(width/colunas)+(width/tamanhotabuleiro)/2, yy * (height/linhas)+ (height/tamanhotabuleiro)/2)
-            //colunas
-            line ( xx * (width/colunas), 0 , xx * (width/colunas), height )
-}
-
-function keyReleased()
-{
-    switch (keyCode){
-
-        case 82:
-            selecao.spr.rotation += 90
-
-            break
-        case 189:
-            zoomatual -= 0.5
-            break
-    
-        case 187:
-            zoomatual += 0.5
-            break
-        case UP_ARROW:
-            camera.y -= 10
-            break
-        case DOWN_ARROW:
-            camera.y += 10
-            break
-        case LEFT_ARROW:
-            camera.x -= 10
-            break
-        case RIGHT_ARROW:
-            camera.x += 10
-            break
-        case 87:
-            selecao.spr.move ("up") //w
-            break
-        case 72: //h
-        //atualizar
-            selecao.spr.mirror.x = !selecao.spr.mirror.x
-
-            break
-        case 86: //v
-
-            //atualizar
-            selecao.spr.mirror.y = !selecao.spr.mirror.y
-            break
-    }
-
-}
 
 function mouseClicked()
 {
+    
     getItemPaleta()
 
+    if (!mostrapaleta)
+    {
+        overBox = false
+    }
     if (!overBox){
-        CriaSprite(mouse.x, mouse.y);
+   
+        criaEntidade(mouse.x, mouse.y);
     }else{
-        
+
         if (
                 mouseX > bx-110 &&
                 mouseX < bx-70 &&
@@ -586,84 +601,13 @@ function mouseClicked()
 
 }
 
-function mousePressed() 
-{
-
-    if (overBox) {
-      locked = true;
-      fill(150, 122, 158)
-    } else {
-      locked = false;
-    }
-    xOffset = mouseX - bx;
-    yOffset = mouseY - by;
-}
-
-function mouseDragged() 
-{
-    if (locked) {
-      bx = mouseX - xOffset;
-      by = mouseY - yOffset;
-    }
-  }
-  
-  function mouseReleased() 
-  {
-    locked = false;
-  }
-
-function fill2DimensionsArray(arr, rows, columns){
-    for (var i = 0; i < rows; i++) {
-        arr.push([0])
-        for (var j = 0; j < columns; j++) {
-            arr[i][j] = structuredClone(entidade);
-        }
-    }
-}
-
-function rolaDado (min = 0, max = 10)
-{
-
-    return floor (random (min, max))
-
-}
 
 
-function plotaPaleta(i = 0, ncolunas = 4){
-    xini =bx-133
-    xxx = xini
-    yini =by-65 
-    yyy = yini
-    vspc = 67
-    hspc = 67
 
-    xxxr = bx -95
-    yyyr = by - 15
-    
-    ii = 0
 
-    for (item of paleta)
-    {
-
-        if (ii == ncolunas)
-        {
-            yyy += vspc 
-            xxx = xini
-            ii = 0
-
-        }
-
-        image(item.img, xxx,yyy)
-
-        xxx += hspc
-        
-        ii++
-
-    }
-}
 
 function getItemPaleta (ncolunas = 4){
-
+if (!mostrapaleta) return;
     xini =bx-133
     xxx = xini
     yini =by-65 
@@ -698,6 +642,25 @@ function getItemPaleta (ncolunas = 4){
                 selecao.img = paleta[ipaleta].img
                 selecao.tipo = paleta[ipaleta].tipo
                 selecao.ipaleta = ipaleta
+
+                //se for player ele coloca o jogador dentro da selecao.entidade para facil acesso no subpainel
+                if (selecao.tipo == tipos.PLAYER){
+                    selecao.entidade = Jogador
+                }
+                if (selecao.tipo == tipos.INIMIGO){
+                    selecao.entidade = inimigos[inimigos.length-1]
+
+                }
+                if (selecao.tipo == tipos.ITEM){
+
+                    
+                    console.log (ipaleta)
+                    console.log (itens.length)
+                    console.log (itens.length - (13-ipaleta))
+                    selecao.item = paleta[ipaleta].item
+
+                }
+                
                 return
             }
 
