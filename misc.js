@@ -104,6 +104,9 @@ function keyReleased()
 {
     switch (keyCode){
 
+        case 67:
+            limpaMapa()
+            break
         case 82:
             selecao.spr.rotation += 90
 
@@ -127,6 +130,27 @@ function keyReleased()
         case RIGHT_ARROW:
             camera.x += 10
             break
+
+        case 83: //s
+        let buffer = []
+        fill2DimensionsArray(buffer,tamanhotabuleiro,tamanhotabuleiro)
+        for (a= 0; a < tamanhotabuleiro; a++)
+        {
+            for (b=0; b < tamanhotabuleiro; b++)
+                
+                 {
+                    buffer[a][b] = paredes[a][b]
+                    buffer[a][b].spr = 0
+                 }
+        }
+            
+            saveJSON (paredes,  "/mapas.json")
+          //  window.localStorage.setItem("mapa",JSON.stringify(buffer),)
+           console.log ("mapa salvo")
+            break
+        case 76://l
+        carregaMapa()
+            break
         case 87:
             selecao.spr.move ("up") //w
             break
@@ -146,3 +170,151 @@ function keyReleased()
     }
 
 }
+
+
+function mapeiaMouse()
+{
+    if (mostrapaleta)
+    {
+        if (
+            mouseX > bx - boxSize &&
+            mouseX < bx + boxSize &&
+            mouseY > (by-160 ) - (boxSize-160) &&
+            mouseY < (by +160) + (boxSize)
+        ) {//esta dentro da caixa
+            overBox = true;
+            if (!locked) 
+            {
+                stroke(255);
+                fill(150, 122, 158);
+            }
+        }else{
+            stroke(226, 220, 176);
+            fill(122, 122, 158);
+            overBox = false;
+        }
+    }
+}
+function mouseClicked()
+{
+    
+    getItemPaleta()
+
+    if (!mostrapaleta)
+    {
+        overBox = false
+    }
+    if (!overBox){
+   
+        criaEntidade(mouse.x, mouse.y);
+    }else{
+
+        if (
+                mouseX > bx-110 &&
+                mouseX < bx-70 &&
+                mouseY > by+240 &&
+                mouseY < by+260 
+         )
+        {
+            selecao.spr.mirror.x = !selecao.spr.mirror.x
+            console.log("espelhah")
+        }
+
+        if (
+            mouseX > bx-15 &&
+            mouseX < bx+15 &&
+            mouseY > by+240 &&
+            mouseY < by+260 
+           )
+        {
+            selecao.spr.rotation += 90
+            console.log("roda")
+        }
+
+        if (
+            mouseX > bx+90-15 &&
+            mouseX < bx+90+15 &&
+            mouseY > by+240 &&
+            mouseY < by+260 
+           )
+        {
+            selecao.spr.mirror.y = !selecao.spr.mirror.y
+            console.log("espelhav")
+        }
+
+
+     //   text ("espelharh", bx-90,by+250)
+    //text ("rodar", bx,by+250)
+    //text ("espelharv", bx+90,by+250)
+
+    }
+
+
+}
+function getItemPaleta (ncolunas = 4){
+    if (!mostrapaleta) return;
+        xini =bx-133
+        xxx = xini
+        yini =by-65 
+        yyy = yini
+        vspc = 67
+        hspc = 67
+    
+        xxxr = bx -95
+        yyyr = by - 15
+        
+        ii = 0
+        ipaleta = 0
+    
+        for (item of paleta)
+        {
+    
+            if (ii == ncolunas)
+            {
+                yyy += vspc 
+                xxx = xini
+                ii = 0
+    
+            }
+    
+            if(
+                mouseX > xxx &&
+                mouseX < xxx +vspc &&
+                mouseY > yyy &&
+                mouseY < yyy + hspc
+                )
+                {
+                    selecao.img = paleta[ipaleta].img
+                    selecao.tipo = paleta[ipaleta].tipo
+                    selecao.ipaleta = ipaleta
+    
+                    //se for player ele coloca o jogador dentro da selecao.entidade para facil acesso no subpainel
+                    if (selecao.tipo == tipos.PLAYER){
+                        selecao.entidade = Jogador
+                    }
+                    if (selecao.tipo == tipos.INIMIGO){
+                        selecao.entidade = inimigos[inimigos.length-1]
+    
+                    }
+                    if (selecao.tipo == tipos.ITEM){
+    
+                        
+                        console.log (ipaleta)
+                        console.log (itens.length)
+                        console.log (itens.length - (13-ipaleta))
+                        selecao.item = paleta[ipaleta].item
+    
+                    }
+                    
+                    return
+                }
+    
+            xxx += hspc
+            ii++
+            ipaleta ++
+       
+        }
+    
+    }
+    
+    

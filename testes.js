@@ -46,7 +46,7 @@ tipos = {
             PLAYER:n++,
             INIMIGO:n++,
             ITEM:n++,
-            VAZIO:n++,
+            VAZIO:n++, /// QUANDO RESETAR QQUER COISA VIRA ISSO
             ARMA:n++,
             ESCUDO:n++,
             EFEITO:n++,
@@ -100,12 +100,12 @@ entidade = {
     y : 0,
     xi:0,//posiçao na tabela
     yi:0,
-    tipo: tipos.CHAO, //parede inimigo item
+    tipo: tipos.VAZIO, //parede inimigo item
     vida:5,
     velocidade : tamanhocelula * 1,
     maoesquerda : 0,
     maodireita :0,
-    nome: "ENTIDADE",
+    nome: "VAZIO",
     item: 0,
     inimigo:0,
     spr: 0
@@ -141,6 +141,80 @@ let imgC
 let imgB
 let imgchao
 let imgSelecionada
+let jsonparedes
+
+function limpaMapa ()
+{
+
+    for (a= 0; a < tamanhotabuleiro; a++)
+    {
+        for (b=0; b < tamanhotabuleiro; b++)
+            {
+                //redundancia
+                if (paredes[a][b].tipo === tipos.PAREDE)
+                {
+                    //console.table (paredes[a][b])
+                    paredes[a][b].spr.remove()
+                    paredes[a][b].tipo = tipos.VAZIO
+                    paredes[a][b].nome = "VAZIO"
+                    //console.table (paredes[a][b])
+                }
+
+            }
+    }
+    
+
+}
+
+
+
+function itemJson ()
+{
+ //console.log()
+
+ //tem que carrregar e ja botar o sprite la
+ for (a= 0; a < tamanhotabuleiro; a++)
+ {
+     for (b=0; b < tamanhotabuleiro; b++)
+         {
+            if ( jsonparedes[a][b].tipo == tipos.PAREDE)
+            {
+                jsonparedes[a][b].xi = a
+                jsonparedes[a][b].yi = b
+                selecao.entidade =0
+                selecao.tipo = tipos.PAREDE
+                selecao.ipaleta = jsonparedes[a][b].ipaleta
+                selecao.img =  paleta[selecao.ipaleta].img
+            //agora manda um cria entidade
+                criaEntidade(-1,-1,1.25,a,b)
+
+           // paredes[a][b].spr.rotation = jsonparedes[a][b].rotation
+                selecao.spr  = paredes[a][b].spr
+                selecao.spr.x = selecao.entidade.x
+                selecao.spr.y = selecao.entidade.y
+            }
+        }
+
+}
+
+}
+
+
+function carregaMapa ()
+{
+   limpaMapa()
+    jsonparedes = loadJSON("mapas.json", itemJson)
+
+ //console.log(jsonparedes[""]["1"])
+ 
+    
+
+ 
+
+
+
+
+}
 
 
 function criaItem (nome, tipo,tipoitem,min,max, img, historia = ""){
@@ -271,29 +345,6 @@ function draw()
 }
 
 
-function mapeiaMouse()
-{
-    if (mostrapaleta)
-    {
-        if (
-            mouseX > bx - boxSize &&
-            mouseX < bx + boxSize &&
-            mouseY > (by-160 ) - (boxSize-160) &&
-            mouseY < (by +160) + (boxSize)
-        ) {//esta dentro da caixa
-            overBox = true;
-            if (!locked) 
-            {
-                stroke(255);
-                fill(150, 122, 158);
-            }
-        }else{
-            stroke(226, 220, 176);
-            fill(122, 122, 158);
-            overBox = false;
-        }
-    }
-}
 
 
 
@@ -368,24 +419,36 @@ function removeEntidade (xx, yy)
  * TODO.
  * mudar isso para criaEntidade
  */
-function criaEntidade (xx, yy, escala = 1.25)
+function criaEntidade (xx, yy, escala = 1.25, xi= -1 , yi= -1)
 {   
 
-    let xi =floor(xx/(width/tamanhotabuleiro)) //indicex
-    let yi =floor(yy/(height/tamanhotabuleiro))//indice y
-   
+    if ( xi === -1)
+    {
+        xi =floor(xx/(width/tamanhotabuleiro)) //indicex
+        yi =floor(yy/(height/tamanhotabuleiro))//indice y
+    
+    }
+
+    if (xx === -1){
+        xx = floor (xi * (width/tamanhotabuleiro))
+        yy = floor (yi * (height/tamanhotabuleiro))
+
+       
+    }
+
     xx     =floor(xx/(width/tamanhotabuleiro))*(width/tamanhotabuleiro)+(width/(tamanhotabuleiro*2))  //localização na tela
     yy     =floor(yy/(height/tamanhotabuleiro))*(height/tamanhotabuleiro)+(height/(tamanhotabuleiro*2)) //localização na tela
     tabuleiro[xi][yi] = new Sprite(xx, yy, width/tamanhotabuleiro,height/tamanhotabuleiro)
-
+  //  tabuleiro[xi][yi].addImage(selecao.img)
+  //  console.log (xx+"x"+yy)
 /**
  * se for do tipo item
  */
+if (selecao.tipo == tipos.VAZIO) return
 
 //console.log (selecao.tipo)
 if (selecao.tipo === tipos.ITEM)
 {
-    console.log ("criou item")
 
      /**
      * precisa fazer
@@ -401,9 +464,7 @@ if (selecao.tipo === tipos.ITEM)
      //esse nome tem q ter em algum lugar
     itensnomapa[ini-1].nome =  selecao.item.nome    
     selecao.entidade = itensnomapa[ini-1]
-
-    console.table(itensnomapa)
-
+  
 }
 
  /**
@@ -470,6 +531,7 @@ if (selecao.tipo === tipos.ITEM)
         if (paredes[xi][yi].tipo == tipos.PAREDE)
         {
             console.log("tem uma parede ai")
+            
             tabuleiro[xi][yi].remove()
             return
 
@@ -494,20 +556,46 @@ if (selecao.tipo === tipos.ITEM)
  * se for do tipo PAREDE
  */
 
-    if (selecao.tipo === tipos.PAREDE)
+    if (selecao.tipo == tipos.PAREDE)
     {
         if (paredes[xi][yi].tipo == tipos.PAREDE)
         {
             tabuleiro[xi][yi].remove()
+            paredes[xi][yi].spr.remove()
+            paredes[xi][yi].tipo= tipos.VAZIO
             console.log("ja tinha uma parede ai")
+            return
 
 
+        }else{
+            //console.log (xx+" "+yy)
+    
+/**
+ * 
+ * criar o sprite direto na entidade como é feito aqui
+ * apagar esse tabuleiro nada a ver e usar direto
+ */
+
+            paredes[xi][yi].ipaleta = selecao.ipaleta
+            paredes[xi][yi].x = xx
+            paredes[xi][yi].y = yy
+            paredes[xi][yi].xi = xi
+            paredes[xi][yi].yi = yi
+            paredes[xi][yi].tipo = tipos.PAREDE
+            paredes[xi][yi].scale = escala
+            paredes[xi][yi].rotation = 0     
+            paredes[xi][yi].nome = "Parede:"+xi+"x"+yi
+            paredes[xi][yi].spr = new Sprite(xx, yy, width/tamanhotabuleiro,height/tamanhotabuleiro)
+            paredes[xi][yi].spr.overlap (allSprites)
+            paredes[xi][yi].spr.addImage(selecao.img)
+            paredes[xi][yi].spr.scale = escala
+           // paredes[xi][yi].spr
+            selecao.entidade = paredes[xi][yi]
+            selecao.spr = paredes[xi][yi].spr
+           
+           // console.log ("criou uma parede")
+         //   console.table (paredes[xi][yi])
         }
-        paredes[xi][yi].ipaleta = selecao.ipaleta
-        paredes[xi][yi].tipo = tipos.PAREDE
-        paredes[xi][yi].scale = escala
-        paredes[xi][yi].rotation = 0     
-        paredes[xi][yi].nome = "Parede:"+xi+"x"+yi
     }
 
     if (!inicializa)
@@ -522,83 +610,34 @@ if (selecao.tipo === tipos.ITEM)
    
     tabuleiro[xi][yi].overlap (allSprites)
     tabuleiro[xi][yi].tileSize = width/tamanhotabuleiro
-    tabuleirox[xi][yi].scale = escala
+   // tabuleirox[xi][yi].scale = escala
     tabuleiro[xi][yi].scale = escala
 
     if (inicializa)
     {
         rnum = 90 * floor(random (4))
         ri = floor (random (2,4))
-        tabuleiro[xi][yi].addAni(paleta[ri].img)
+        tabuleiro[xi][yi].addImage(selecao.img)
         tabuleiro[xi][yi].rotation = rnum
-        tabuleirox[xi][yi].ipaleta = ri
-        tabuleirox[xi][yi].rotation = rnum
+     //   tabuleirox[xi][yi].ipaleta = ri
+      //  tabuleirox[xi][yi].rotation = rnum
     }else{
 
-        tabuleiro[xi][yi].addAni (selecao.img)
+        //arrumar
+        if (selecao.tipo != tipos.parede ){
+        tabuleiro[xi][yi].addImage(selecao.img)
     }
-
+        //tabuleiro[xi][yi].debug = true
+    
+    
+      
+    }
+    //arrumar
+    if (selecao.tipo != tipos.PAREDE){
     selecao.spr = tabuleiro[xi][yi]
-}
-
-
-
-
-function mouseClicked()
-{
-    
-    getItemPaleta()
-
-    if (!mostrapaleta)
-    {
-        overBox = false
-    }
-    if (!overBox){
-   
-        criaEntidade(mouse.x, mouse.y);
     }else{
-
-        if (
-                mouseX > bx-110 &&
-                mouseX < bx-70 &&
-                mouseY > by+240 &&
-                mouseY < by+260 
-         )
-        {
-            selecao.spr.mirror.x = !selecao.spr.mirror.x
-            console.log("espelhah")
-        }
-
-        if (
-            mouseX > bx-15 &&
-            mouseX < bx+15 &&
-            mouseY > by+240 &&
-            mouseY < by+260 
-           )
-        {
-            selecao.spr.rotation += 90
-            console.log("roda")
-        }
-
-        if (
-            mouseX > bx+90-15 &&
-            mouseX < bx+90+15 &&
-            mouseY > by+240 &&
-            mouseY < by+260 
-           )
-        {
-            selecao.spr.mirror.y = !selecao.spr.mirror.y
-            console.log("espelhav")
-        }
-
-
-     //   text ("espelharh", bx-90,by+250)
-    //text ("rodar", bx,by+250)
-    //text ("espelharv", bx+90,by+250)
-
+        tabuleiro[xi][yi].remove()
     }
-
-
 }
 
 
@@ -606,69 +645,8 @@ function mouseClicked()
 
 
 
-function getItemPaleta (ncolunas = 4){
-if (!mostrapaleta) return;
-    xini =bx-133
-    xxx = xini
-    yini =by-65 
-    yyy = yini
-    vspc = 67
-    hspc = 67
 
-    xxxr = bx -95
-    yyyr = by - 15
-    
-    ii = 0
-    ipaleta = 0
 
-    for (item of paleta)
-    {
 
-        if (ii == ncolunas)
-        {
-            yyy += vspc 
-            xxx = xini
-            ii = 0
 
-        }
-
-        if(
-            mouseX > xxx &&
-            mouseX < xxx +vspc &&
-            mouseY > yyy &&
-            mouseY < yyy + hspc
-            )
-            {
-                selecao.img = paleta[ipaleta].img
-                selecao.tipo = paleta[ipaleta].tipo
-                selecao.ipaleta = ipaleta
-
-                //se for player ele coloca o jogador dentro da selecao.entidade para facil acesso no subpainel
-                if (selecao.tipo == tipos.PLAYER){
-                    selecao.entidade = Jogador
-                }
-                if (selecao.tipo == tipos.INIMIGO){
-                    selecao.entidade = inimigos[inimigos.length-1]
-
-                }
-                if (selecao.tipo == tipos.ITEM){
-
-                    
-                    console.log (ipaleta)
-                    console.log (itens.length)
-                    console.log (itens.length - (13-ipaleta))
-                    selecao.item = paleta[ipaleta].item
-
-                }
-                
-                return
-            }
-
-        xxx += hspc
-        ii++
-        ipaleta ++
-   
-    }
-
-}
 
