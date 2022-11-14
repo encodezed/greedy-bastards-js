@@ -1,5 +1,4 @@
 
-
 let tipos = {
     PAREDE:0,
     CHAO:1,
