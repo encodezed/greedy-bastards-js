@@ -4,14 +4,48 @@
     // Para obter mais informações, acesse: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-    {
-        "type": "vscode-edge-devtools.debug",
-        "request": "attach",
-        "name": "Attach to Microsoft Edge and open the Edge DevTools",
-        "url": "http://127.0.0.1:5500",
-        "webRoot": "${workspaceFolder}"
-    },
-        
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "teste.x:HelloWorldFunction (nodejs16.x)",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "${workspaceFolder}/nodejs/teste.x/template.yaml",
+                "logicalId": "HelloWorldFunction"
+            },
+            "lambda": {
+                "payload": {},
+                "environmentVariables": {},
+                "runtime": "nodejs16.x"
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "API teste.x:HelloWorldFunction (nodejs16.x)",
+            "invokeTarget": {
+                "target": "api",
+                "templatePath": "${workspaceFolder}/nodejs/teste.x/template.yaml",
+                "logicalId": "HelloWorldFunction"
+            },
+            "api": {
+                "path": "/hello",
+                "httpMethod": "get",
+                "payload": {
+                    "json": {}
+                }
+            },
+            "lambda": {
+                "runtime": "nodejs16.x"
+            }
+        },
+        {
+            "type": "vscode-edge-devtools.debug",
+            "request": "attach",
+            "name": "Attach to Microsoft Edge and open the Edge DevTools",
+            "url": "http://127.0.0.1:5500",
+            "webRoot": "${workspaceFolder}"
+        },
         {
             "type": "pwa-chrome",
             "name": "127.0.0.1:5500",

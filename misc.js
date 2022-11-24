@@ -1,20 +1,27 @@
 function geraGrade() {
-    const linhas = tamanhotabuleiro
-    const colunas = tamanhotabuleiro
+    const linhas = tamanhoTabuleiro
+    const colunas = tamanhoTabuleiro
 
     for (xx = 0; xx < colunas; xx ++) {
         for (yy = 0; yy < linhas; yy ++) {
-            selecao.img = paleta[rolaDado(2, 5)].img
-            criaEntidade(xx * (width / colunas), yy * (height / linhas))
+            //selecao.img = paleta[rolaDado(2, 5)].img
+            //getItemTipo(tipos.CHAO, subtipos.VAZIO)
+           // camera.on()
+            criaEntidade(xx*tamanhoCelula,yy*tamanhoCelula,1.25)
+            //camera.off()
         }
     }
     inicializa = false
+   
+  //  criaGrade()
 }
 
 function criaGrade() { // linhas
+    const linhas = tamanhoTabuleiro
+    const colunas = tamanhoTabuleiro
     line(0, yy * (height / linhas), width, yy * (height / linhas))
     // meio
-    point(xx * (width / colunas) + (width / tamanhotabuleiro) / 2, yy * (height / linhas) + (height / tamanhotabuleiro) / 2)
+    point(xx * (width / colunas) + (width / tamanhoTabuleiro) / 2, yy * (height / linhas) + (height / tamanhoTabuleiro) / 2)
     // colunas
     line(xx * (width / colunas), 0, xx * (width / colunas), height)
 }
@@ -22,7 +29,7 @@ function mousePressed() {
     if (mouseButton === RIGHT) {
         selecionaItem(getItemMapa(mouseX, mouseY))
     }
-    if (!mostrapaleta) {
+    if (!mostraPaleta) {
         return
     }
     if (overBox) {
@@ -36,7 +43,7 @@ function mousePressed() {
 }
 
 function mouseDragged() {
-    if (!mostrapaleta) {
+    if (!mostraPaleta) {
         return
     }
     if (locked) {
@@ -46,7 +53,7 @@ function mouseDragged() {
 }
 
 function mouseReleased() {
-    if (!mostrapaleta) {
+    if (!mostraPaleta) {
         return
     }
     locked = false;
@@ -101,8 +108,9 @@ function plotaPaleta(i = 0, ncolunas = 4) {
 
 function keyReleased() {
     switch (keyCode) {
-
-        case 67: limpaMapa()
+       
+        case 67: 
+            limpaMapa()
             break
         case 82:
             selecao.spr.rotation += 90
@@ -116,23 +124,23 @@ function keyReleased() {
             zoomatual += 0.5
             break
         case UP_ARROW:
-            camera.y -= 10
+            camera.y -= 64
             break
         case DOWN_ARROW:
-            camera.y += 10
+            camera.y += 64
             break
         case LEFT_ARROW:
-            camera.x -= 10
+            camera.x -= 64
             break
         case RIGHT_ARROW:
-            camera.x += 10
+            camera.x += 64
             break
 
         case 83: // s
             let buffer = []
-            fill2DimensionsArray(buffer, tamanhotabuleiro, tamanhotabuleiro)
-            for (a = 0; a < tamanhotabuleiro; a ++) {
-                for (b = 0; b < tamanhotabuleiro; b ++) {
+            fill2DimensionsArray(buffer, tamanhoTabuleiro, tamanhoTabuleiro)
+            for (a = 0; a < tamanhoTabuleiro; a ++) {
+                for (b = 0; b < tamanhoTabuleiro; b ++) {
                     buffer[a][b] = paredes[a][b]
                     buffer[a][b].spr = 0
                 }
@@ -146,11 +154,26 @@ function keyReleased() {
             carregaMapa()
             break
         case 87:
-            selecao.spr.move("up") // w
+            //selecao.spr.move("up") // w
+            switch (modoAtual){
+                case modos.CRIASALA:
+                    modoAtual = modos.EDICAO
+                    console.log ("modo edicao")
+                    mostraPaleta = true
+                    break
+                case modos.EDICAO:
+                    modoAtual = modos.CRIASALA
+                    console.log("modo criasala")
+                    mostraPaleta  = false
+                    break
+
+
+            }
+            
             break
         case 80:
-            mostrapaleta = !mostrapaleta
-
+            mostraPaleta = !mostraPaleta
+            break
         case 72:
             // h
             // atualizar
@@ -169,7 +192,7 @@ function keyReleased() {
 
 
 function mapeiaMouse() {
-    if (mostrapaleta) {
+    if (mostraPaleta) {
         if (mouseX > bx - boxSize && mouseX < bx + boxSize && mouseY > (by - 160) - (boxSize - 160) && mouseY < (by + 160) + (boxSize)) { // esta dentro da caixa
             overBox = true;
             if (!locked) {
@@ -187,40 +210,51 @@ function mouseClicked() {
 
     getItemPaleta()
 
-    if (!mostrapaleta) {
+    if (!mostraPaleta) {
         overBox = false
     }
+    //se NAO estiver dentro da paleta
     if (!overBox) {
 
-        criaEntidade(mouse.x, mouse.y);
-    } else {
-
-        if (mouseX > bx - 110 && mouseX < bx - 70 && mouseY > by + 240 && mouseY < by + 260) {
-            selecao.spr.mirror.x = !selecao.spr.mirror.x
-            console.log("espelhah")
-        }
-
-        if (mouseX > bx - 15 && mouseX < bx + 15 && mouseY > by + 240 && mouseY < by + 260) {
-            selecao.spr.rotation += 90
-            console.log("roda")
-        }
-
-        if (mouseX > bx + 90 - 15 && mouseX < bx + 90 + 15 && mouseY > by + 240 && mouseY < by + 260) {
-            selecao.spr.mirror.y = !selecao.spr.mirror.y
-            console.log("espelhav")
-        }
+            switch (modoAtual)
+            {
+                case modos.EDICAO:
+                    criaEntidade(mouse.x, mouse.y)
+                    break
+                case modos.CRIASALA:
+                    criaSala (mouse.x, mouse.y,6,4)
+                    break
 
 
-        // text ("espelharh", bx-90,by+250)
-        // text ("rodar", bx,by+250)
-        // text ("espelharv", bx+90,by+250)
+            }
+            
+        } else {
+
+            if (mouseX > bx - 110 && mouseX < bx - 70 && mouseY > by + 240 && mouseY < by + 260) {
+                selecao.spr.mirror.x = !selecao.spr.mirror.x
+                console.log("espelhah")
+            }
+
+            if (mouseX > bx - 15 && mouseX < bx + 15 && mouseY > by + 240 && mouseY < by + 260) {
+                selecao.spr.rotation += 90
+                console.log("roda")
+            }
+
+            if (mouseX > bx + 90 - 15 && mouseX < bx + 90 + 15 && mouseY > by + 240 && mouseY < by + 260) {
+                selecao.spr.mirror.y = !selecao.spr.mirror.y
+                console.log("espelhav")
+            }
+
+
+            // text ("espelharh", bx-90,by+250)
+            // text ("rodar", bx,by+250)            // text ("espelharv", bx+90,by+250)
 
     }
 
 
 }
 function getItemPaleta(ncolunas = 4) {
-    if (!mostrapaleta) 
+    if (!mostraPaleta) 
         return;
     
     xini = bx - 133
@@ -261,9 +295,9 @@ function getItemPaleta(ncolunas = 4) {
             if (selecao.tipo == tipos.ITEM) {
 
 
-                console.log(ipaleta)
-                console.log(itens.length)
-                console.log(itens.length -(13 - ipaleta))
+                //console.log(ipaleta)
+                //console.log(itens.length)
+                //console.log(itens.length -(13 - ipaleta))
                 selecao.item = paleta[ipaleta].item
 
             }
@@ -281,8 +315,8 @@ function getItemPaleta(ncolunas = 4) {
 
 function limpaMapa() {
 
-    for (a = 0; a < tamanhotabuleiro; a ++) {
-        for (b = 0; b < tamanhotabuleiro; b ++) { // redundancia
+    for (a = 0; a < tamanhoTabuleiro; a ++) {
+        for (b = 0; b < tamanhoTabuleiro; b ++) { // redundancia
             if (paredes[a][b].tipo === tipos.PAREDE) {
 
                 paredes[a][b].spr.remove()
@@ -302,8 +336,8 @@ function itemJson() {
     // console.log()
 
     // tem que carrregar e ja botar o sprite la
-    for (a = 0; a < tamanhotabuleiro; a ++) {
-        for (b = 0; b < tamanhotabuleiro; b ++) {
+    for (a = 0; a < tamanhoTabuleiro; a ++) {
+        for (b = 0; b < tamanhoTabuleiro; b ++) {
             if (jsonparedes[a][b].tipo == tipos.PAREDE) {
                 jsonparedes[a][b].xi = a
                 jsonparedes[a][b].yi = b
@@ -330,4 +364,35 @@ function carregaMapa() {
     limpaMapa()
     jsonparedes = loadJSON("mapas.json", itemJson)
 
+}
+
+
+function makeShadow(img, sigma, shadowColor, opacity) {
+  // Gaussian goes to approx. 0 at 3sigma
+  // away from the mean; pad image with
+  // 3sigma on all sides to give space
+  const newW = img.width + 6 * sigma;
+  const newH = img.height + 6 * sigma;
+  const g = createGraphics(newW, newH);
+  
+  g.imageMode(CENTER);
+  g.translate(newW/2, newH/2);
+  //g.tint(0, 0, 0, );
+  g.image(img, 0, 0);
+  g.filter(BLUR, sigma);
+  
+  const shadow = g.get();
+  const c = color(shadowColor);
+  shadow.loadPixels();
+  const numVals = 4 * shadow.width * shadow.height;
+  for (let i = 0; i < numVals; i+=4) {
+    shadow.pixels[i + 0] = c.levels[0];
+    shadow.pixels[i + 1] = c.levels[1];
+    shadow.pixels[i + 2] = c.levels[2];
+    shadow.pixels[i + 3] *= opacity;
+  }
+  shadow.updatePixels();
+  
+  g.remove();
+  return shadow;
 }
