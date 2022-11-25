@@ -1,5 +1,6 @@
 p5.disableFriendlyErrors = true
 /*
+<<<<<<< HEAD
 
  _____ ____  _____ _____ ____ ___  _   ____  ____  ____  _____  ____  ____  ____  ____ 
 /  __//  __\/  __//  __//  _ \\  \//  /  __\/  _ \/ ___\/__ __\/  _ \/  __\/  _ \/ ___\
@@ -23,11 +24,14 @@ p5.disableFriendlyErrors = true
                                                 ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝
                                         
  
+=======
+Estagio de testes
+>>>>>>> 8b8fa36aedcd1a88e6dd4ab584c6c6133c6e7c6e
 
 TODOS:
  #########COMEÇAR A FAZER SANGUE NO CHÃO E COISAS FOFOGORE##########
  ###### FAZER COM QUE LUZES TENHAM "LUZ" ao redor usando o overlay
-
+peidinho cheia de ar
 */
 
 /**
@@ -226,13 +230,7 @@ let ladon = {
     3:"DIREITA",
 }
 
-/**
- * 
- * @param {*} sala 
- * @param {*} tipo 
- * @param {*} x 
- * @param {*} y 
- */
+
 function criaEntidadeSala(sala, tipo, x, y)
 {
 
