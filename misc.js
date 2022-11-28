@@ -27,7 +27,10 @@ function criaGrade() { // linhas
 }
 function mousePressed() {
     if (mouseButton === RIGHT) {
-        selecionaItem(getItemMapa(mouseX, mouseY))
+
+       
+       // sisParticulas (mouse.x,mouse.y)
+        selecionaItem(getItemMapa(mouse.x,mouse.y))
     }
     if (!mostraPaleta) {
         return

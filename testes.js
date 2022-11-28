@@ -39,7 +39,7 @@ let tamanhoCelula = 64
 let tamanhoTabuleiro = 50
 
 
-let zoomatual = 1 //2.5
+let zoomatual = 1//2.5
 let sprSelecionado
 var tabuleiro = []
 var inimigos = []
@@ -177,6 +177,7 @@ entidade = {
     item: 0,
     inimigo: 0,
     spr: 0
+
 }
 
 var Jogador = structuredClone(entidade)
@@ -200,6 +201,9 @@ let yOffset = 0.0;
  * -TODO-
  * trocar isso fazendo uma array de cada tipo
  */
+
+let imgFumaca
+
 let gspr
 let imgCSE
 let imgCSD
@@ -227,6 +231,54 @@ let ladon = {
 }
 
 
+
+
+/**
+ * movimenta os inimigos
+ *  se tiver na linha de visao 
+ */
+
+function doAiInimigos ()
+{
+    for (inimigo of inimigos)
+    {
+
+
+
+    }
+
+
+
+
+}
+
+
+
+/**
+ * Uma funcao que cria um sistema de particulas
+ */
+
+let gParticulas
+
+function sisParticulas (_x, _y, textura = imgFumaca)
+
+{
+    for (a = 0; a < 10; a++){
+            let sprFumacinha = new Sprite(_x, _y, 32)
+            sprFumacinha.scale = 1.5
+            sprFumacinha.overlap(allSprites)
+            sprFumacinha.rotation = random (360)
+            sprFumacinha.direction = random (0,-180)
+            sprFumacinha.speed = random (5,10)
+            sprFumacinha.life = random (3,4)
+            sprFumacinha.rotationSpeed = 380
+            sprFumacinha.addImage (textura)
+            gParticulas.push (sprFumacinha)
+    }
+    
+}
+
+
 function criaEntidadeSala(sala, tipo, x, y)
 {
 
@@ -245,7 +297,7 @@ function criaEntidadeSala(sala, tipo, x, y)
     {
         
         getItemTipo(tipos.PLAYER, subtipos.VAZIO)   
-        criaEntidade(vmeiosala, hmeiosala, 1.25, -1, -1, true)
+        criaEntidade(vmeiosala-3, hmeiosala-3, 1.25, -1, -1, true)
 
     }
     if (tipo == tipos.INIMIGO)
@@ -618,11 +670,12 @@ function preload() { /**
  * chao como tem variacoes usa uma array
  * o mesmo sera feito com paredes etc... o que muda é o tipo
  */
+    
     longa = loadImage("Arte/Sprites/Item/Longa2.png")
     pocaovida = loadImage("Arte/Sprites/Item/PocaoVida.png")
     escudo = loadImage("Arte/Sprites/Item/EscudoSimples.png")
 
-
+    imgFumaca = loadImage ("Arte/Sprites/fumacinha.png")
     imgOverlay = loadImage("Arte/UI/spotlight.png")
     imgchao = loadImage("Arte/Paredes/15.png")
     chaos.push(imgchao)
@@ -642,7 +695,7 @@ function preload() { /**
 
     Jogador.tipo = tipos.PLAYER
 
-
+    gParticulas = new Group()
     /**
     * inicializa a variavel paleta com 2 variaveis, imagem e tipo 
     * ####>>>>>>>> implementar escala personalizada<<<<<<######
@@ -861,6 +914,30 @@ function draw() {
     }
 
 
+    /**
+     * colocar essa parte de particula num drawParticulas
+     * 
+     */
+    for (part of gParticulas)
+    {
+        push()
+            
+           
+        
+            tint (255,255,255,100* part.life)
+
+            if (part)
+
+            part.draw()
+
+
+        pop()
+
+
+    }
+
+
+    //gParticulas.draw()
     camera.off() // desliga acamera para fazer a ui
     push()
     blendMode(MULTIPLY)
@@ -898,33 +975,25 @@ function selecionaItem(_entidade) {
  */
 function getItemMapa(xx = -1, yy = -1, xi = -1, yi = -1) {
 
+
+    if (xx === -1) {
+        xx = xi * tamanhoCelula
+        yy = yi * tamanhoCelula
+       // console.log("entrou aqui")
+    }
     if (xi === -1) {
         xi = floor(xx / tamanhoCelula) // indicex
         yi = floor(yy / tamanhoCelula) // indice y
 
     }
-    if (xx === -1) {
-        xx = xi * tamanhoCelula
-        yy = yi * tamanhoCelula
-        console.log("entrou aqui")
-    }
 
     xx = xi * tamanhoCelula
     yy = yi * tamanhoCelula
 
-    /*
-    if (xi === -1) {
-        xi = floor(xx / (width / tamanhoTabuleiro)) // indicex
-        yi = floor(yy / (height / tamanhoTabuleiro)) // indice y
-    }
+    console.log (xi+"x"+yi)
 
-    if (xx === -1) {
-        xx = floor(xi * (width / tamanhoTabuleiro))
-        yy = floor(yi * (height / tamanhoTabuleiro))
-    }
-    xx = floor(xx / (width / tamanhoTabuleiro)) * (width / tamanhoTabuleiro) - (width / (tamanhoTabuleiro * 2)) // localização na tela
-    yy = floor(yy / (height / tamanhoTabuleiro)) * (height / tamanhoTabuleiro) - (height / (tamanhoTabuleiro * 2)) // localização na tela
-*/
+
+
     if (paredes[xi][yi].tipo == tipos.PAREDE) {
         console.log("tem uma parede aqui")
         console.log(paredes[xi][yi].nome)
@@ -943,7 +1012,12 @@ function getItemMapa(xx = -1, yy = -1, xi = -1, yi = -1) {
     for (_inimigo of inimigos) {
 
         if (_inimigo.xi === xi && _inimigo.yi === yi) {
-            console.log("tem um inimigo aqui")
+
+            console.log ("esse inimigo esta a distancia de "+distancia(_inimigo,Jogador))
+            andaDirecao(_inimigo,Jogador)
+
+
+            //console.log("tem um inimigo aqui")
             console.log(_inimigo.nome)
             return _inimigo
         }
@@ -961,6 +1035,123 @@ function getItemMapa(xx = -1, yy = -1, xi = -1, yi = -1) {
 
     return -1
 }
+
+/**
+ * informa a direção que a entidade2 esta em relação a entidade 1
+ * @param {*} entidade1 
+ * @param {*} entidade2 
+ * @returns lado
+ */
+
+function direcao (entidade1, entidade2)
+{
+
+   
+       if (entidade1.xi < entidade2.xi ) return  lados.ESQUERDA
+      if (entidade1.xi > entidade2.xi ) return  lados.DIREITA
+       if (entidade1.yi > entidade2.yi ) return  lados.BAIXO
+       if (entidade1.yi < entidade2.yi ) return  lados.CIMA
+}
+
+
+function andaDirecao (entidade1, entidade2)
+{
+
+
+    if (distancia(entidade1,entidade2) > 1)
+    {
+     switch (direcao(entidade1,entidade2))
+     {
+        case lados.CIMA:
+         p("move pra cima")
+            moveEntidade(entidade1, 0,1)
+            break
+        case lados.BAIXO:
+            p("move pra baixo")
+            moveEntidade(entidade1, 0,-1)
+            break
+        case lados.ESQUERDA:
+            p("move pra esquerda")
+            moveEntidade(entidade1, 1,0)
+            break
+        case lados.DIREITA:
+            p("move pra direita")
+            moveEntidade(entidade1, -1,0)
+            break
+     }
+
+    }else{
+        return 0
+    }
+}
+
+
+
+/**
+ * 
+ * @param {*} _entidade 
+ * @param {*} _x quantidade de casas na horizontal
+ * @param {*} _y quantidade de casas na vertical
+ * @returns 1 se foi bem sucedido 
+ */
+function moveEntidade(_entidade, _x = 0, _y = 0 )
+{
+    if (_y > 0)
+    {    
+        _entidade.y +=  tamanhoCelula
+        _entidade.yi += 1
+        _entidade.spr.y += tamanhoCelula
+        _entidade.sprSombra.y +=  tamanhoCelula
+        
+    }
+    if (_y < 0)
+    {
+        _entidade.y -= tamanhoCelula
+        _entidade.yi -= 1
+        _entidade.spr.y -= tamanhoCelula
+        _entidade.sprSombra.y -=  tamanhoCelula
+    }
+
+    if (_x > 0 )
+    {
+        _entidade.x +=  tamanhoCelula
+        _entidade.xi += 1
+        _entidade.spr.x +=  tamanhoCelula
+        _entidade.sprSombra.x +=  tamanhoCelula
+      
+    }
+    if (_x < 0)
+    {
+        _entidade.x -=  tamanhoCelula
+        _entidade.xi -= 1
+        _entidade.spr.x -=  tamanhoCelula
+        _entidade.sprSombra.x -=  tamanhoCelula
+        
+    }
+  
+
+    return 1
+    
+
+}
+
+
+/**
+ * calcula a distancia entre duas entidades
+ * @param {*} entidade1 
+ * @param {*} entidade2 
+ * @returns INT distancia entre as duas entidades 
+ */
+function distancia (entidade1, entidade2)
+{
+    let _distancia = 0
+    let dx = entidade1.xi - entidade2.xi
+    let dy = entidade1.yi - entidade2.yi 
+    console.log(dx +"x"+ dy)
+    _distancia = Math.abs (Math.abs(dx) + Math.abs(dy))
+    return _distancia
+}
+
 
 
 /**
@@ -1059,7 +1250,8 @@ function criaEntidade(xx, yy, escala = 1.25, xi = -1, yi = -1, mirrorx = false, 
         xx = xi * tamanhoCelula
         yy = yi * tamanhoCelula
         // console.log("entrou aqui")
-    }xx = xi * tamanhoCelula
+    }
+    xx = xi * tamanhoCelula
     yy = yi * tamanhoCelula
 
 
@@ -1179,6 +1371,7 @@ function criaEntidade(xx, yy, escala = 1.25, xi = -1, yi = -1, mirrorx = false, 
         }
         var ini = inimigos.push(structuredClone(entidade))
 
+        
         inimigos[ini - 1].x = xx
         inimigos[ini - 1].y = yy
         inimigos[ini - 1].xi = xi
@@ -1186,7 +1379,7 @@ function criaEntidade(xx, yy, escala = 1.25, xi = -1, yi = -1, mirrorx = false, 
         // esse nome tem q ter em algum lugar
         inimigos[ini - 1].nome = "Goblinzitus:" + xi + "x" + yi
         inimigos[ini - 1].tipo = tipos.INIMIGO
-
+        inimigos[ini - 1].engaged = false
         inimigos[ini - 1].index = ini - 1
 
         inimigos[ini - 1].sprSombra = new Sprite(xx - 2, yy + 36, tamanhoCelula, tamanhoCelula)
@@ -1195,6 +1388,7 @@ function criaEntidade(xx, yy, escala = 1.25, xi = -1, yi = -1, mirrorx = false, 
         inimigos[ini - 1].sprSombra.mirror.y = true
         inimigos[ini - 1].spr = new Sprite(xx, yy, tamanhoCelula, tamanhoCelula)
         inimigos[ini - 1].spr.addImage(selecao.img)
+        inimigos[ini - 1].spr.entidade = inimigos[ini - 1]
         inimigos[ini - 1].spr.overlap(allSprites)
         selecao.entidade = inimigos[ini - 1]
         selecao.spr = inimigos[ini - 1].spr
