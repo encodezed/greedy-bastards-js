@@ -30,7 +30,9 @@ function mousePressed() {
 
        
        // sisParticulas (mouse.x,mouse.y)
-        selecionaItem(getItemMapa(mouse.x,mouse.y))
+        //selecionaItem(getItemMapa(mouse.x,mouse.y))
+
+     
     }
     if (!mostraPaleta) {
         return
@@ -112,6 +114,25 @@ function plotaPaleta(i = 0, ncolunas = 4) {
 function keyReleased() {
     switch (keyCode) {
        
+        case 56: //cima no numpad
+            if (moveEntidade(Jogador, 0,-1))camera.y -= 64
+            setTimeout(doAiInimigos,200)
+           // doAiInimigos()
+            
+        break
+        case 50: //baixo no numpad
+           if( moveEntidade(Jogador, 0,1))camera.y += 64
+           setTimeout(doAiInimigos,200)
+        break
+        case 52: //esquerda no numpad
+           if ( moveEntidade(Jogador, 1,0)) camera.x -= 64
+           setTimeout(doAiInimigos,200)
+        break
+        case 54: //direita numpad
+            if (moveEntidade(Jogador, -1,0))  camera.x += 64
+            setTimeout(doAiInimigos,200)
+        break
+        
         case 67: 
             limpaMapa()
             break
