@@ -27,7 +27,10 @@ p5.disableFriendlyErrors = true;
 TODOS:
  #########COMEÇAR A FAZER SANGUE NO CHÃO E COISAS FOFOGORE##########
  ###### FAZER COM QUE LUZES TENHAM "LUZ" ao redor usando o overlay
-peidinho cheia de ar
+
+	-fazer com que o jogo varra a pasta de paredes e importe tudo proceduralmente conforme o nome da peça
+
+
 */
 
 /**
@@ -68,11 +71,12 @@ modos = {
 	JOGO: 2,
 };
 
-var modoAtual = modos.CRIASALA;
+var modoAtual = modos.JOGO;
 
 n = 0;
 tipos = {
 	PAREDE: n++,
+	TRAP: n++,
 	CHAO: n++,
 	DECORACAO: n++,
 	PLAYER: n++,
@@ -97,6 +101,8 @@ subtipos = {
 	BANDEIRA: n++,
 	VAZIO: n++,
 	PORTA: n++,
+	SPIKESOFF: n++,
+	SPIKESON: n++,
 };
 
 n = 0;
@@ -210,6 +216,12 @@ let imgB;
 let imgchao;
 let imgSelecionada;
 let jsonparedes;
+
+let decoracaoCima = [];
+let numDeco = 7;
+
+let spikeson;
+let spikesoff;
 
 let lados = {
 	CIMA: 0,
@@ -598,9 +610,6 @@ function criaItem(nome, tipo, tipoitem, min, max, img, historia = "") {
  *
  */
 
-// subir isso
-let decoracaoCima = [];
-let numDeco = 7;
 function preload() {
 	/**
 	 * inicializa as imagens
@@ -629,6 +638,9 @@ function preload() {
 
 	player = loadImage("Arte/Sprites/Player/meninagato/MGFULL.png");
 	goblin = loadImage("Arte/Sprites/Goblin/0 2.png");
+
+	spikeson = loadImage("Arte/traps/spikeson.png");
+	spikesoff = loadImage("Arte/traps/spikesoff.png");
 
 	Jogador.tipo = tipos.PLAYER;
 
@@ -709,6 +721,16 @@ function preload() {
 		tipo: tipos.DECORACAO,
 		subtipo: subtipos.VAZIO,
 		escala: -1,
+	});
+	paleta.push({
+		img: spikeson,
+		tipo: tipos.TRAP,
+		subtipo: subtipos.SPIKEON,
+	});
+	paleta.push({
+		img: spikesoff,
+		tipo: tipos.TRAP,
+		subtipo: subtipos.SPIKEOFF,
 	});
 	criaItem(
 		"Espada Longa do Poder",
@@ -817,6 +839,7 @@ function draw() {
 	camera.on();
 	camera.zoom = zoomatual;
 	if (inicializa) {
+
 		geraGrade();
 		tamanhosalainicial = 6;
 
@@ -848,6 +871,7 @@ function draw() {
 			if (porta == lados.DIREITA)
 				criaEntidadeSala(criaSalaDireita(salas[0]), tipos.INIMIGO);
 		}
+		iniUi()
 	}
 	allSprites.draw();
 
@@ -920,19 +944,13 @@ function draw() {
 		pop();
 	}
 
-	//gParticulas.draw()
-	camera.off(); // desliga acamera para fazer a ui
-	push();
-	blendMode(MULTIPLY);
-	tint(
-		240 + noise(frameCount) * 300,
-		240 + noise(frameCount) * 300,
-		140 + noise(frameCount) * 200,
-		170
-	);
-	image(imgOverlay, -100, -100);
 
-	pop();
+
+	drawSpotlight()
+	drawVida()
+	drawUI()
+	camera.off(); // desliga acamera para fazer a ui
+
 	strokeWeight(8);
 	if (mostraPaleta) {
 		drawPaleta();
@@ -1042,9 +1060,6 @@ function andaDirecao(entidade1, entidade2) {
 		ladornd = -1;
 	}
 
-	//    if (entidade1.ladoanterior == vertical) entidade1.ladoanterior  = horizontal
-	//    if (entidade1.ladoanterior == horizontal) entidade1.ladoanterior  = vertical
-
 	if (distancia(entidade1, entidade2) > 1) {
 		switch (direcao(entidade1, entidade2)) {
 			case lados.CIMA:
@@ -1135,8 +1150,11 @@ const horizontal = 1;
  */
 function moveEntidade(_entidade, _x = 0, _y = 0) {
 	if (_y > 0) {
+		console.log("pra baixo")
 		for (inimigo of inimigos) {
 			if (inimigo.xi == _entidade.xi && inimigo.yi == _entidade.yi + 1) {
+				sisParticulas(inimigo.x, inimigo.y)
+				removeEntidade(inimigo)
 				console.log("colidiu como um inimigo");
 				return 0;
 			}
@@ -1160,6 +1178,8 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 	if (_y < 0) {
 		for (inimigo of inimigos) {
 			if (inimigo.xi == _entidade.xi && inimigo.yi == _entidade.yi - 1) {
+				sisParticulas(inimigo.x, inimigo.y)
+				removeEntidade(inimigo)
 				console.log("colidiu como um inimigo");
 				return 0;
 			}
@@ -1183,6 +1203,8 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 	if (_x < 0) {
 		for (inimigo of inimigos) {
 			if (inimigo.xi == _entidade.xi + 1 && inimigo.yi == _entidade.yi) {
+				sisParticulas(inimigo.x, inimigo.y)
+				removeEntidade(inimigo)
 				console.log("colidiu como um inimigo");
 				return 0;
 			}
@@ -1198,8 +1220,8 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 		_entidade.x += tamanhoCelula;
 		_entidade.xi += 1;
 		_entidade.spr.x += tamanhoCelula;
-		_entidade.spr.mirror.x = true;
-		_entidade.sprSombra.mirror.x = true;
+		_entidade.spr.mirror.x = false;
+		_entidade.sprSombra.mirror.x = false;
 		_entidade.sprSombra.x += tamanhoCelula;
 		_entidade.ladoanterior = horizontal;
 		return 1;
@@ -1207,6 +1229,8 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 	if (_x > 0) {
 		for (inimigo of inimigos) {
 			if (inimigo.xi == _entidade.xi - 1 && inimigo.yi == _entidade.yi) {
+				sisParticulas(inimigo.x, inimigo.y)
+				removeEntidade(inimigo)
 				console.log("colidiu como um inimigo");
 				return 0;
 			}
@@ -1222,8 +1246,8 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 		_entidade.x -= tamanhoCelula;
 		_entidade.xi -= 1;
 		_entidade.spr.x -= tamanhoCelula;
-		_entidade.spr.mirror.x = false;
-		_entidade.sprSombra.mirror.x = false;
+		_entidade.spr.mirror.x = true;
+		_entidade.sprSombra.mirror.x = true;
 
 		_entidade.sprSombra.x -= tamanhoCelula;
 		_entidade.ladoanterior = horizontal;
@@ -1352,7 +1376,11 @@ function criaEntidade(
 	if (selecao.tipo == tipos.VAZIO) {
 		return;
 	}
+	if (selecao.tipo == tipos.TRAP) {
+		if (selecao.subtipo == subtipos.SPIKEON)
 
+		return;
+	}
 	if (selecao.tipo === tipos.DECORACAO) {
 		var ini = decoracaoCima.push(structuredClone(entidade));
 		decoracaoCima[ini - 1].x = xx;
@@ -1477,17 +1505,6 @@ function criaEntidade(
 	 * se for do tipo PLAYER
 	 */
 	if (selecao.tipo === tipos.PLAYER) {
-		/*
-        if (paredes[xi][yi].tipo == tipos.PAREDE) {
-            console.log("tem uma parede ai")
-
-            //tabuleiro[xi][yi].remove()
-            return
-
-        }
-        */
-
-		// tabuleiro[xi][yi].remove()
 		if (Jogador.spr != 0) {
 			Jogador.spr.remove();
 			Jogador.sprSombra.remove();
@@ -1509,20 +1526,24 @@ function criaEntidade(
 		Jogador.sprSombra.overlap(allSprites);
 
 		Jogador.sprSombra.mirror.y = true;
-		Jogador.sprSombra.mirror.x = false;
+
 		Jogador.spr = new Sprite(xx, yy, tamanhoCelula, tamanhoCelula);
 		Jogador.spr.addImage(selecao.img);
 		Jogador.spr.overlap(allSprites);
-		Jogador.spr.mirror.x = false;
+
+		mirrorx = true;
+
 		selecao.entidade = Jogador;
 		selecao.spr = Jogador.spr;
 		if (mirrorx) {
 			Jogador.spr.mirror.x = true;
 			Jogador.sprSombra.mirror.x = true;
+			Jogador.mirrorx = true;
 		}
 		if (mirrory) {
 			Jogador.spr.mirror.y = true;
 			Jogador.sprSombra.mirror.y = true;
+			Jogador.mirrory = true;
 		}
 
 		Jogador.sprSombra.addImage(selecao.img);
