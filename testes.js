@@ -30,6 +30,8 @@ TODOS:
 
 	-fazer com que o jogo varra a pasta de paredes e importe tudo proceduralmente conforme o nome da peça
 
+	-ataque
+
 
 */
 
@@ -671,6 +673,8 @@ function preload() {
 	spikesoff = loadImage("Arte/traps/spikesoff.png");
 	bauoff = loadImage("Arte/traps/bauoff.png")
 
+	ataque = loadImage ("Arte/Sprites/Player/meninagatoattack.png")
+
 	Jogador.tipo = tipos.PLAYER;
 
 	gParticulas = new Group();
@@ -1217,7 +1221,7 @@ const horizontal = 1;
 function moveEntidade(_entidade, _x = 0, _y = 0) {
 	
 	if (_y > 0) {
-		console.log("pra baixo")
+		//console.log("pra baixo")
 		for (inimigo of inimigos) {
 			if (inimigo.xi == _entidade.xi && inimigo.yi == _entidade.yi + 1) {
 				sisParticulas(inimigo.x, inimigo.y)
