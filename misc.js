@@ -503,7 +503,7 @@ function iniUi()
     spotlight = new Sprite(imgspotlight)
     spotlight.x =width/2
     spotlight.y = height/2
-    spotlight.scale = 0.75
+    spotlight.scale = 1.3
     spotlight.static = true
    
 
