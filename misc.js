@@ -503,7 +503,8 @@ function iniUi()
     spotlight = new Sprite(imgspotlight)
     spotlight.x =width/2
     spotlight.y = height/2
-    spotlight.scale = 1.3
+    spotlight.scale = 0.8+ (width/ 2100)
+
     spotlight.static = true
    
 
@@ -513,7 +514,7 @@ function drawSpotlight()
     camera.off()
     push()
     blendMode(OVERLAY)
-    tint (115,125,190,205+noise(cos(frameCount*15))*25)
+    tint (175,175,120,230+(noise(cos(frameCount*15))*25))
     spotlight.draw()
     pop()
     spotlight.x =width/2
