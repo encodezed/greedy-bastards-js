@@ -41,7 +41,7 @@ TODOS:
 let mostraPaleta = false;
 let inicializa = true;
 let tamanhoCelula = 64;
-let tamanhoTabuleiro = 50;
+let tamanhoTabuleiro = 25;
 let glitchmode = false
 
 let zoomatual = 2.5;
@@ -1020,7 +1020,7 @@ function draw() {
 		
 		fill(0,0,0,30)
 		rectMode(CORNER)
-		rect ((width/2)+64,0,width/2,height)
+		rect ((width/2)+tamanhoCelula *3,0,width/2,height)
 		noStroke()
 		
 		camera.on()
@@ -1235,6 +1235,34 @@ function andaDirecao(entidade1, entidade2) {
 	return 1;
 }
 
+function doMovimento (_entidade, xi, yi, _velocidade= 200)
+{
+	if (xi)
+	{
+		p5.tween.manager
+            .addTween (_entidade.spr, "movimento")
+            .addMotion ('x', _entidade.spr.x +  (xi * tamanhoCelula),_velocidade,'easeInOutSin')
+            .startTween()
+			p5.tween.manager
+            .addTween (_entidade.sprSombra, "movimento")
+            .addMotion ('x',_entidade.spr.x +  (xi * tamanhoCelula) ,_velocidade,'easeInOutSin')
+            .startTween()
+	}
+	if (yi)
+	{
+		p5.tween.manager
+            .addTween (_entidade.spr, "movimento")
+            .addMotion ('y',_entidade.spr.y +  (yi * tamanhoCelula),_velocidade,'easeInOutSin')
+            .startTween()
+		p5.tween.manager
+            .addTween (_entidade.sprSombra, "movimento")
+            .addMotion ('y', _entidade.sprSombra.y +  (yi * tamanhoCelula), _velocidade,'easeInOutSin')
+            .startTween()
+	}
+	
+}
+
+
 const vertical = 0;
 const horizontal = 1;
 /**
@@ -1247,7 +1275,6 @@ const horizontal = 1;
 function moveEntidade(_entidade, _x = 0, _y = 0) {
 	
 	if (_y > 0) {
-		console.log("pra baixo")
 		for (inimigo of inimigos) {
 			if (inimigo.xi == _entidade.xi && inimigo.yi == _entidade.yi + 1) {
 				sisParticulas(inimigo.x, inimigo.y)
@@ -1288,7 +1315,7 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 			console.log("colidiu com uma parede");
 			return 0;
 		}
-
+		doMovimento(_entidade, 0, 1, 100)
 		_entidade.y += tamanhoCelula;
 		_entidade.yi += 1;
 		_entidade.spr.y += tamanhoCelula;
@@ -1335,6 +1362,7 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 			console.log("colidiu com uma parede");
 			return 0;
 		}
+		doMovimento(_entidade, 0, -1, 100)
 		_entidade.y -= tamanhoCelula;
 		_entidade.yi -= 1;
 		_entidade.spr.y -= tamanhoCelula;
@@ -1381,6 +1409,7 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 			console.log("colidiu com uma parede");
 			return 0;
 		}
+		doMovimento(_entidade, 1, 0, 100)
 		_entidade.x += tamanhoCelula;
 		_entidade.xi += 1;
 		_entidade.spr.x += tamanhoCelula;
@@ -1427,6 +1456,7 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 			console.log("colidiu com uma parede");
 			return 0;
 		}
+		doMovimento(_entidade, -1, 0, 100)
 		_entidade.x -= tamanhoCelula;
 		_entidade.xi -= 1;
 		_entidade.spr.x -= tamanhoCelula;
