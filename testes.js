@@ -38,11 +38,13 @@ TODOS:
 /**
  * globais
  */
+
+let dialogOn = false;
 let mostraPaleta = false;
 let inicializa = true;
 let tamanhoCelula = 64;
 let tamanhoTabuleiro = 25;
-let glitchmode = false
+let glitchmode = false;
 
 let zoomatual = 2.5;
 let sprSelecionado;
@@ -93,7 +95,7 @@ tipos = {
 	POCAO: n++,
 	DELETAR: n++,
 	PORTA: n++,
-	TESOURO:n++,
+	TESOURO: n++,
 };
 
 n = 0;
@@ -109,6 +111,7 @@ subtipos = {
 	SPIKESON: n++,
 	BAUON: n++,
 	BAUOFF: n++,
+	SANGUE: n++
 };
 
 n = 0;
@@ -224,8 +227,8 @@ let imgSelecionada;
 let jsonparedes;
 
 let decoracaoCima = [];
-let traps = []
-let tesouros = []
+let traps = [];
+let tesouros = [];
 let numDeco = 7;
 
 let spikeson;
@@ -245,6 +248,15 @@ let ladon = {
 };
 
 
+let gSangues 
+function doSangue (x,y,cor = 0)
+{
+	let sangue = new Sprite(x,y,tamanhoCelula,tamanhoCelula)
+	sangue.addImage(sangues[floor(random (0,7))])
+	sangue.scale = (random (0.7,1.4))
+	sangue.overlap(allSprites)
+	gSangues.push (sangue)
+}
 
 /**
  * movimenta os inimigos
@@ -282,7 +294,7 @@ function sisParticulas(_x, _y, textura = imgFumaca) {
 	}
 }
 
-function criaEntidadeSala(sala, tipo,subtipo, x, y) {
+function criaEntidadeSala(sala, tipo, subtipo, x, y) {
 	let vmeiosala = sala.x + (sala.largura / 2) * 64;
 	let hmeiosala = sala.y + (sala.altura / 2) * 64;
 	let darknumberx = sala.x + floor(random(2, sala.largura - 1)) * tamanhoCelula;
@@ -299,28 +311,25 @@ function criaEntidadeSala(sala, tipo,subtipo, x, y) {
 	if (tipo == tipos.INIMIGO) {
 		getItemTipo(tipos.INIMIGO, subtipos.VAZIO);
 		criaEntidade(darknumberx, darknumbery, 1.25, -1, -1, true);
-		selecao.entidade.variacao = random (0 , 0.2)
-		_mirror =  floor(random (-1,2))
-		selecao.entidade.spr.mirror.x =_mirror
-		selecao.entidade.sprSombra.mirror.x = _mirror
-
+		selecao.entidade.variacao = random(0, 0.2);
+		_mirror = floor(random(-1, 2));
+		selecao.entidade.spr.mirror.x = _mirror;
+		selecao.entidade.sprSombra.mirror.x = _mirror;
 	}
 
 	if (tipo == tipos.TRAP) {
 		getItemTipo(tipos.TRAP, subtipos.SPIKESOFF);
-		
-		criaEntidade(darknumberx, darknumbery-2, 1.25, -1, -1, true);
+
+		criaEntidade(darknumberx, darknumbery - 2, 1.25, -1, -1, true);
 	}
 
-	if (tipo == tipos.TESOURO){
-		if (subtipo == subtipos.BAUOFF){
+	if (tipo == tipos.TESOURO) {
+		if (subtipo == subtipos.BAUOFF) {
 			getItemTipo(tipos.TESOURO, subtipos.BAUOFF);
-			
-			criaEntidade(darknumberx, darknumbery, 2, -1, -1, true,false);
 
+			criaEntidade(darknumberx, darknumbery, 2, -1, -1, true, false);
 		}
 	}
-		
 }
 
 function criaPortas() {
@@ -554,7 +563,7 @@ function criaSala(xini, yini, lSala, aSala, origem = -1) {
 						origem == lados.DIREITA ||
 						temPorta(salas[i - 1].portas, lados.ESQUERDA)
 					) {
-					//	p(i - 1 + " tem que ter porta na parede esquerda");
+						//	p(i - 1 + " tem que ter porta na parede esquerda");
 						//porta vai aqui
 					} else {
 						getItemTipo(tipos.PAREDE, subtipos.ESQUERDA);
@@ -575,7 +584,7 @@ function criaSala(xini, yini, lSala, aSala, origem = -1) {
 						origem == lados.ESQUERDA ||
 						temPorta(salas[i - 1].portas, lados.DIREITA)
 					) {
-					//	p("tem que ter porta na parede direita");
+						//	p("tem que ter porta na parede direita");
 						//porta vai aqui
 					} else {
 						getItemTipo(tipos.PAREDE, subtipos.ESQUERDA);
@@ -640,6 +649,7 @@ function criaItem(nome, tipo, tipoitem, min, max, img, historia = "") {
  * com varias celulas dentro , com o tipo INIMIGO
  *
  */
+let sangues =[]
 
 function preload() {
 	/**
@@ -647,6 +657,11 @@ function preload() {
 	 * chao como tem variacoes usa uma array
 	 * o mesmo sera feito com paredes etc... o que muda é o tipo
 	 */
+
+	 gSangues = new Group()
+	 const dir = 'Arte/Sprites/Misc/Sangues';
+	 
+	
 
 	longa = loadImage("Arte/Sprites/Item/Longa2.png");
 	pocaovida = loadImage("Arte/Sprites/Item/PocaoVida.png");
@@ -672,9 +687,9 @@ function preload() {
 
 	spikeson = loadImage("Arte/traps/spikeson.png");
 	spikesoff = loadImage("Arte/traps/spikesoff.png");
-	bauoff = loadImage("Arte/traps/bauoff.png")
+	bauoff = loadImage("Arte/traps/bauoff.png");
 
-	ataque = loadImage ("Arte/Sprites/Player/meninagatoattack.png")
+	ataque = loadImage("Arte/Sprites/Player/meninagatoattack.png");
 
 	Jogador.tipo = tipos.PLAYER;
 
@@ -756,7 +771,7 @@ function preload() {
 		subtipo: subtipos.VAZIO,
 		escala: -1,
 	});
-	
+
 	criaItem(
 		"Espada Longa do Poder",
 		tipos.ITEM,
@@ -785,6 +800,9 @@ function preload() {
 		"Pocao de vida"
 	);
 
+
+	
+
 	for (a = 0; a < numDeco; a++) {
 		let imgDeco = loadImage("Arte/Sprites/Misc/top_" + a + ".png");
 
@@ -794,6 +812,20 @@ function preload() {
 			subtipo: subtipos.VAZIO,
 			escala: -1,
 		});
+	}
+
+	for (a = 0; a < 8; a++)
+	{
+		let sangue = loadImage(dir +"/"+ a + ".png");
+		sangues.push (sangue)
+	   //sangues.push(dir + a )
+	   paleta.push({
+		img: sangue,
+		tipo: tipos.DECORACAO,
+		subtipo: subtipos.SANGUE,
+		escala: 0.5,
+	});
+
 	}
 
 	paleta.push({
@@ -851,13 +883,13 @@ function getItemTipo(_tipo, _subtipo) {
 
 		return 2;
 	}
-	
+
 	for (_item of paleta) {
 		if (_item.tipo == _tipo && _item.subtipo == _subtipo) {
 			selecao.ipaleta = n;
 			selecao.img = _item.img;
 			selecao.tipo = _item.tipo;
-			selecao.subtipo = _subtipo
+			selecao.subtipo = _subtipo;
 			return 1;
 		}
 		n++;
@@ -881,7 +913,6 @@ function draw() {
 	camera.on();
 	camera.zoom = zoomatual;
 	if (inicializa) {
-
 		geraGrade();
 		tamanhosalainicial = 6;
 
@@ -895,29 +926,41 @@ function draw() {
 		camera.x = (tamanhoTabuleiro / 2) * tamanhoCelula + 2 * tamanhoCelula;
 		camera.y = (tamanhoTabuleiro / 2) * tamanhoCelula + 2 * tamanhoCelula;
 
-		criaEntidadeSala(salas[0], tipos.PLAYER,subtipos.VAZIO);
-		
-		criaEntidadeSala(salas[0], tipos.INIMIGO,subtipos.VAZIO);
-			
-		criaEntidadeSala(salas[0], tipos.INIMIGO,subtipos.VAZIO);
-		
-		criaEntidadeSala(salas[0], tipos.INIMIGO,subtipos.VAZIO);
-		
+		criaEntidadeSala(salas[0], tipos.PLAYER, subtipos.VAZIO);
+
+		criaEntidadeSala(salas[0], tipos.INIMIGO, subtipos.VAZIO);
+
+		criaEntidadeSala(salas[0], tipos.INIMIGO, subtipos.VAZIO);
+
+		criaEntidadeSala(salas[0], tipos.INIMIGO, subtipos.VAZIO);
+
 		for (porta of salas[0].portas) {
 			if (porta == lados.CIMA)
 				criaEntidadeSala(criaSalaCima(salas[0]), tipos.INIMIGO, subtipos.VAZIO);
 
 			if (porta == lados.BAIXO)
-				criaEntidadeSala(criaSalaBaixo(salas[0]), tipos.INIMIGO,subtipos.VAZIO);
+				criaEntidadeSala(
+					criaSalaBaixo(salas[0]),
+					tipos.INIMIGO,
+					subtipos.VAZIO
+				);
 
 			if (porta == lados.ESQUERDA)
-				criaEntidadeSala(criaSalaEsquerda(salas[0]), tipos.INIMIGO,subtipos.VAZIO);
+				criaEntidadeSala(
+					criaSalaEsquerda(salas[0]),
+					tipos.INIMIGO,
+					subtipos.VAZIO
+				);
 			if (porta == lados.DIREITA)
-				criaEntidadeSala(criaSalaDireita(salas[0]), tipos.INIMIGO,subtipos.VAZIO);
+				criaEntidadeSala(
+					criaSalaDireita(salas[0]),
+					tipos.INIMIGO,
+					subtipos.VAZIO
+				);
 		}
-		criaEntidadeSala(salas[0], tipos.TRAP,subtipos.SPIKESOFF)
-		criaEntidadeSala(salas[0], tipos.TESOURO,subtipos.BAUOFF)
-		iniUi()
+		criaEntidadeSala(salas[0], tipos.TRAP, subtipos.SPIKESOFF);
+		criaEntidadeSala(salas[0], tipos.TESOURO, subtipos.BAUOFF);
+		iniUi();
 	}
 	allSprites.draw();
 
@@ -930,10 +973,13 @@ function draw() {
 
 		trap.spr.draw();
 	}
-	for (_tesouro of tesouros)
-	{
-		_tesouro.spr.draw()
+	push ()
+	tint (255,255,255,225)
+	gSangues.draw()
 
+	pop()
+	for (_tesouro of tesouros) {
+		_tesouro.spr.draw();
 	}
 	if (Jogador.spr) {
 		push();
@@ -953,27 +999,26 @@ function draw() {
 	}
 	if (!inicializa) {
 		for (inimigo of inimigos) {
-		
-
-		if ((Jogador.spr.mirror.x == true && inimigo.xi >= Jogador.xi) || (Jogador.spr.mirror.x == false && inimigo.xi <= Jogador.xi))
-		{	push();
-			tint(0, 0, 0, 210);
-			inimigo.sprSombra.scale = flutuacao + 0.02;
-			inimigo.sprSombra.draw();
-			pop();
-
-			inimigo.spr.scale = inimigo.variacao + flutuacao + 0.02;
-
-			if (inimigo.engaged) {
+			if (
+				(Jogador.spr.mirror.x == true && inimigo.xi >= Jogador.xi) ||
+				(Jogador.spr.mirror.x == false && inimigo.xi <= Jogador.xi)
+			) {
 				push();
-				tint(255 - flutuacao, 180, 180, 252);
-				inimigo.spr.draw();
+				tint(0, 0, 0, 210);
+				inimigo.sprSombra.scale = flutuacao + 0.02;
+				inimigo.sprSombra.draw();
 				pop();
-			} else {
-				
-				inimigo.spr.draw();
-				
-			}
+
+				inimigo.spr.scale = inimigo.variacao + flutuacao + 0.02;
+
+				if (inimigo.engaged) {
+					push();
+					tint(255 - flutuacao, 180, 180, 252);
+					inimigo.spr.draw();
+					pop();
+				} else {
+					inimigo.spr.draw();
+				}
 			}
 		}
 
@@ -987,8 +1032,6 @@ function draw() {
 		for (decoracao of decoracaoCima) {
 			decoracao.spr.draw();
 		}
-
-		
 	}
 
 	/**
@@ -1005,46 +1048,36 @@ function draw() {
 		pop();
 	}
 
+	if (Jogador.spr.mirror.x == true) {
+		camera.off();
 
-	if (Jogador.spr.mirror.x == true){
-		camera.off()
-		
-		fill(0,0,0,30)
-		rect (0,0,width/2-64,height)
-		noStroke()
-		
-		camera.on()
+		fill(0, 0, 0, 30);
+		rect(0, 0, width / 2 - 64, height);
+		noStroke();
 
-	}else{
-		camera.off()
-		
-		fill(0,0,0,30)
-		rectMode(CORNER)
-		rect ((width/2)+tamanhoCelula *3,0,width/2,height)
-		noStroke()
-		
-		camera.on()
+		camera.on();
+	} else {
+		camera.off();
 
+		fill(0, 0, 0, 30);
+		rectMode(CORNER);
+		rect(width / 2 + tamanhoCelula * 3, 0, width / 2, height);
+		noStroke();
+
+		camera.on();
 	}
 
-	drawSpotlight()
-	drawVida()
-	drawUI()
+	doDialogo();
+	drawSpotlight();
+	drawVida();
+	drawUI();
 	camera.off(); // desliga acamera para fazer a ui
-
-	
 
 	if (mostraPaleta) {
 		drawPaleta();
 	}
 
 	//fill(20, 22, 26);
-
-	text(
-		"Greedy Bastars - CatGirls Tail - maptool v0.5 - @zednaked",
-		width / 2,
-		20
-	);
 }
 
 /**
@@ -1077,21 +1110,18 @@ function getItemMapa(xx = -1, yy = -1, xi = -1, yi = -1) {
 	xx = xi * tamanhoCelula;
 	yy = yi * tamanhoCelula;
 
-//	console.log(xi + "x" + yi);
-//console.log("🚀 ~ file: testes.js:1020 ~ getItemMapa ~ traps", traps)
-for (_trap of traps) {
-	
+	//	console.log(xi + "x" + yi);
+	//console.log("🚀 ~ file: testes.js:1020 ~ getItemMapa ~ traps", traps)
+	for (_trap of traps) {
+		if (_trap.xi == xi && _trap.yi == yi) {
+			console.log("tem uma trap aqui");
 
-	
-	if (_trap.xi == xi && _trap.yi == yi) {
-		console.log("tem uma trap aqui");
-		
-		getItemTipo(tipos.TRAP,subtipos.SPIKESON)
-		criaEntidade(_trap.spr.x,_trap.spr.y)
-		removeEntidade(_trap)
-		return selecao.entidade ;
+			getItemTipo(tipos.TRAP, subtipos.SPIKESON);
+			criaEntidade(_trap.spr.x, _trap.spr.y);
+			removeEntidade(_trap);
+			return selecao.entidade;
+		}
 	}
-}
 	if (paredes[xi][yi].tipo == tipos.PAREDE) {
 		console.log("tem uma parede aqui");
 		console.log(paredes[xi][yi].nome);
@@ -1127,9 +1157,39 @@ for (_trap of traps) {
 			return _item;
 		}
 	}
-	
 
 	return -1;
+}
+
+function doDialogo() {
+	if (dialogOn) {
+		camera.off();
+
+		fill(0, 0, 0, 150);
+
+		rect(width / 2, height / 2, 400, 200);
+		rect(width / 2 - 10, height / 2 - 10, 400, 200);
+		noStroke();
+		//scale (-1)
+		image(player, width / 2 + 230, 200 + 200, 200, 200); //aquis
+		stroke(20);
+		line(width / 2 - 390, height / 2, width / 2 + 390, height / 2);
+		noStroke();
+		image(goblin, width / 2 - 380, 200, 200, 200);
+		textAlign(LEFT);
+		textSize(20);
+		fill(160);
+		text(
+			"Menina Gato, prepare-se para cuspir \nsua ultima bola de pêlos !",
+			width / 2 - 150,
+			300
+		);
+		text("Você ja esta morto, apenas não sabe! ", width / 2 - 200, 500);
+
+		text("...", width / 2, 580);
+
+		camera.on();
+	}
 }
 
 /**
@@ -1229,39 +1289,84 @@ function andaDirecao(entidade1, entidade2) {
 		}
 	} else {
 		p(entidade1.nome + " esta colado em " + entidade2.nome);
+		sisParticulas (Jogador.x, Jogador.y)
+		doSangue(Jogador.x, Jogador.y)
+		
 		return 0;
 	}
 
 	return 1;
 }
 
-function doMovimento (_entidade, xi, yi, _velocidade= 200)
-{
-	if (xi)
-	{
+function doMovimento(_entidade, xi, yi, _velocidade = 200) {
+	if (xi) {
 		p5.tween.manager
-            .addTween (_entidade.spr, "movimento")
-            .addMotion ('x', _entidade.spr.x +  (xi * tamanhoCelula),_velocidade,'easeInOutSin')
-            .startTween()
-			p5.tween.manager
-            .addTween (_entidade.sprSombra, "movimento")
-            .addMotion ('x',_entidade.spr.x +  (xi * tamanhoCelula) ,_velocidade,'easeInOutSin')
-            .startTween()
+			.addTween(_entidade.spr, "movimento")
+			.addMotion(
+				"x",
+				_entidade.spr.x + xi * tamanhoCelula,
+				_velocidade,
+				"easeInOutSin"
+			)
+			.startTween();
+		p5.tween.manager
+			.addTween(_entidade.sprSombra, "movimento")
+			.addMotion(
+				"x",
+				_entidade.spr.x + xi * tamanhoCelula,
+				_velocidade,
+				"easeInOutSin"
+			)
+			.startTween();
+		if (_entidade.tipo == tipos.PLAYER)
+			{
+				p5.tween.manager
+					.addTween(camera, "movimento")
+					.addMotion(
+						"x",
+						camera.x + xi * tamanhoCelula,
+						_velocidade,
+						"easeInOutSin"
+					)
+					.startTween();
+		
+			}		
 	}
-	if (yi)
-	{
+	if (yi) {
 		p5.tween.manager
-            .addTween (_entidade.spr, "movimento")
-            .addMotion ('y',_entidade.spr.y +  (yi * tamanhoCelula),_velocidade,'easeInOutSin')
-            .startTween()
+			.addTween(_entidade.spr, "movimento")
+			.addMotion(
+				"y",
+				_entidade.spr.y + yi * tamanhoCelula,
+				_velocidade,
+				"easeInOutSin"
+			)
+			.startTween();
 		p5.tween.manager
-            .addTween (_entidade.sprSombra, "movimento")
-            .addMotion ('y', _entidade.sprSombra.y +  (yi * tamanhoCelula), _velocidade,'easeInOutSin')
-            .startTween()
+			.addTween(_entidade.sprSombra, "movimento")
+			.addMotion(
+				"y",
+				_entidade.sprSombra.y + yi * tamanhoCelula,
+				_velocidade,
+				"easeInOutSin"
+			)
+			.startTween();
+		if (_entidade.tipo == tipos.PLAYER)
+			{
+				p5.tween.manager
+					.addTween(camera, "movimento")
+					.addMotion(
+						"y",
+						camera.y + yi * tamanhoCelula,
+						_velocidade,
+						"easeInOutSin"
+					)
+					.startTween();
+		
+			}	
 	}
 	
 }
-
 
 const vertical = 0;
 const horizontal = 1;
@@ -1273,49 +1378,44 @@ const horizontal = 1;
  * @returns 1 se foi bem sucedido
  */
 function moveEntidade(_entidade, _x = 0, _y = 0) {
-	
 	if (_y > 0) {
 		for (inimigo of inimigos) {
 			if (inimigo.xi == _entidade.xi && inimigo.yi == _entidade.yi + 1) {
-				sisParticulas(inimigo.x, inimigo.y)
-				removeEntidade(inimigo)
+				//doSangue(inimigo.x, inimigo.y)
+				sisParticulas(inimigo.x, inimigo.y);
+				
+				removeEntidade(inimigo);
 				console.log("colidiu como um inimigo");
 				return 0;
 			}
 		}
 
-		for (_trap of traps)
-		{
-			
-			if (_trap.xi == _entidade.xi && _trap.yi == _entidade.yi +1){
-			
-				if (_trap.subtipo != subtipos.SPIKESON)
-				
-				{
-					getItemTipo(tipos.TRAP,subtipos.SPIKESON)
-					criaEntidade(_trap.spr.x,_trap.spr.y)
-					removeEntidade(_trap)
-					console.log ("colidiu com uma trap fechada")
-					return 0
-				}else{
-					sisParticulas(Jogador.x,Jogador.y+tamanhoCelula)
-					console.log ("colidiu com uma trap aberta")
+		for (_trap of traps) {
+			if (_trap.xi == _entidade.xi && _trap.yi == _entidade.yi + 1) {
+				if (_trap.subtipo != subtipos.SPIKESON) {
+					getItemTipo(tipos.TRAP, subtipos.SPIKESON);
+					criaEntidade(_trap.spr.x, _trap.spr.y);
+					removeEntidade(_trap);
+					console.log("colidiu com uma trap fechada");
+					return 0;
+				} else {
+					sisParticulas(Jogador.x, Jogador.y + tamanhoCelula);
+					console.log("colidiu com uma trap aberta");
 					//return 0
 				}
 			}
-		
-
 		}
 
 		if (Jogador.xi == _entidade.xi && Jogador.yi == _entidade.yi + 1) {
 			console.log("colidiu com o jogador");
+			
 			return 0;
 		}
 		if (paredes[_entidade.xi][_entidade.yi + 1].tipo == tipos.PAREDE) {
 			console.log("colidiu com uma parede");
 			return 0;
 		}
-		doMovimento(_entidade, 0, 1, 100)
+		doMovimento(_entidade, 0, 1, 100);
 		_entidade.y += tamanhoCelula;
 		_entidade.yi += 1;
 		_entidade.spr.y += tamanhoCelula;
@@ -1324,32 +1424,26 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 		return 1;
 	}
 	if (_y < 0) {
-
-		for (_trap of traps)
-		{
-			
-			if (_trap.xi == _entidade.xi && _trap.yi == _entidade.yi -1){
-				if (_trap.subtipo != subtipos.SPIKESON)
-				{
-					getItemTipo(tipos.TRAP,subtipos.SPIKESON)
-					criaEntidade(_trap.spr.x,_trap.spr.y)
-					removeEntidade(_trap)
-					console.log ("colidiu com uma trap fechada")
-					return 0
-				}else{
-
-					sisParticulas(Jogador.x,Jogador.y-tamanhoCelula)
-					console.log ("colidiu com uma trap aberta")
+		for (_trap of traps) {
+			if (_trap.xi == _entidade.xi && _trap.yi == _entidade.yi - 1) {
+				if (_trap.subtipo != subtipos.SPIKESON) {
+					getItemTipo(tipos.TRAP, subtipos.SPIKESON);
+					criaEntidade(_trap.spr.x, _trap.spr.y);
+					removeEntidade(_trap);
+					console.log("colidiu com uma trap fechada");
+					return 0;
+				} else {
+					sisParticulas(Jogador.x, Jogador.y - tamanhoCelula);
+					console.log("colidiu com uma trap aberta");
 					//return 0
 				}
 			}
 		}
 
-
 		for (inimigo of inimigos) {
 			if (inimigo.xi == _entidade.xi && inimigo.yi == _entidade.yi - 1) {
-				sisParticulas(inimigo.x, inimigo.y)
-				removeEntidade(inimigo)
+				sisParticulas(inimigo.x, inimigo.y);
+				removeEntidade(inimigo);
 				console.log("colidiu como um inimigo");
 				return 0;
 			}
@@ -1362,7 +1456,7 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 			console.log("colidiu com uma parede");
 			return 0;
 		}
-		doMovimento(_entidade, 0, -1, 100)
+		doMovimento(_entidade, 0, -1, 100);
 		_entidade.y -= tamanhoCelula;
 		_entidade.yi -= 1;
 		_entidade.spr.y -= tamanhoCelula;
@@ -1372,31 +1466,28 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 	}
 
 	if (_x < 0) {
-		for (_trap of traps)
-		{
-						if (_trap.xi == _entidade.xi + 1 && _trap.yi == _entidade.yi){
-				if (_trap.subtipo != subtipos.SPIKESON)
-				
-				{
-					getItemTipo(tipos.TRAP,subtipos.SPIKESON)
-					criaEntidade(_trap.spr.x,_trap.spr.y)
-					removeEntidade(_trap)
-					console.log ("colidiu com uma trap fechada A DIREITA")
-					selecao.entidade.subtipo = subtipos.SPIKESON
-					console.table (traps)
-					return 0
-				}else{
-					sisParticulas(Jogador.x+tamanhoCelula,Jogador.y)
+		for (_trap of traps) {
+			if (_trap.xi == _entidade.xi + 1 && _trap.yi == _entidade.yi) {
+				if (_trap.subtipo != subtipos.SPIKESON) {
+					getItemTipo(tipos.TRAP, subtipos.SPIKESON);
+					criaEntidade(_trap.spr.x, _trap.spr.y);
+					removeEntidade(_trap);
+					console.log("colidiu com uma trap fechada A DIREITA");
+					selecao.entidade.subtipo = subtipos.SPIKESON;
+					console.table(traps);
+					return 0;
+				} else {
+					sisParticulas(Jogador.x + tamanhoCelula, Jogador.y);
 
-					console.log ("colidiu com uma trap aberta")
+					console.log("colidiu com uma trap aberta");
 					//return 0
 				}
 			}
 		}
 		for (inimigo of inimigos) {
 			if (inimigo.xi == _entidade.xi + 1 && inimigo.yi == _entidade.yi) {
-				sisParticulas(inimigo.x, inimigo.y)
-				removeEntidade(inimigo)
+				sisParticulas(inimigo.x, inimigo.y);
+				removeEntidade(inimigo);
 				console.log("colidiu como um inimigo");
 				return 0;
 			}
@@ -1409,7 +1500,7 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 			console.log("colidiu com uma parede");
 			return 0;
 		}
-		doMovimento(_entidade, 1, 0, 100)
+		doMovimento(_entidade, 1, 0, 100);
 		_entidade.x += tamanhoCelula;
 		_entidade.xi += 1;
 		_entidade.spr.x += tamanhoCelula;
@@ -1420,30 +1511,27 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 		return 1;
 	}
 	if (_x > 0) {
-		
-		for (_trap of traps)
-		{
-			if (_trap.xi == _entidade.xi - 1 && _trap.yi == _entidade.yi){
-				if (_trap.subtipo != subtipos.SPIKESON)
-				{
-					getItemTipo(tipos.TRAP,subtipos.SPIKESON)
-					criaEntidade(_trap.spr.x,_trap.spr.y)
-					removeEntidade(_trap)
-					console.log ("colidiu com uma trap fechada")
-					return 0
-				}else{
-					sisParticulas(Jogador.x-tamanhoCelula,Jogador.y)
+		for (_trap of traps) {
+			if (_trap.xi == _entidade.xi - 1 && _trap.yi == _entidade.yi) {
+				if (_trap.subtipo != subtipos.SPIKESON) {
+					getItemTipo(tipos.TRAP, subtipos.SPIKESON);
+					criaEntidade(_trap.spr.x, _trap.spr.y);
+					removeEntidade(_trap);
+					console.log("colidiu com uma trap fechada");
+					return 0;
+				} else {
+					sisParticulas(Jogador.x - tamanhoCelula, Jogador.y);
 
-					console.log ("colidiu com uma trap aberta")
+					console.log("colidiu com uma trap aberta");
 					//return 0
 				}
 			}
 		}
-		
+
 		for (inimigo of inimigos) {
 			if (inimigo.xi == _entidade.xi - 1 && inimigo.yi == _entidade.yi) {
-				sisParticulas(inimigo.x, inimigo.y)
-				removeEntidade(inimigo)
+				sisParticulas(inimigo.x, inimigo.y);
+				removeEntidade(inimigo);
 				console.log("colidiu como um inimigo");
 				return 0;
 			}
@@ -1456,7 +1544,7 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 			console.log("colidiu com uma parede");
 			return 0;
 		}
-		doMovimento(_entidade, -1, 0, 100)
+		doMovimento(_entidade, -1, 0, 100);
 		_entidade.x -= tamanhoCelula;
 		_entidade.xi -= 1;
 		_entidade.spr.x -= tamanhoCelula;
@@ -1556,20 +1644,13 @@ function removeEntidade(_entidade) {
 	if (_entidade.tipo === tipos.TRAP) {
 		console.log("deletou um item");
 		_entidade.tipo = tipos.VAZIO;
-		_entidade.subtipo = subtipos.VAZIO
+		_entidade.subtipo = subtipos.VAZIO;
 		_entidade.spr.remove();
 		traps.splice(_entidade.index, 1);
 	}
 }
 
-
-function iniEntidade ()
-{
-
-
-	 
-}
-
+function iniEntidade() {}
 
 /**
  * cria celula
@@ -1611,80 +1692,65 @@ function criaEntidade(
 	}
 
 	if (selecao.tipo == tipos.TESOURO) {
-		if (selecao.subtipo == subtipos.BAUOFF)
-		{
+		if (selecao.subtipo == subtipos.BAUOFF) {
 			var ini = tesouros.push(structuredClone(entidade));
-			
-			
 
 			tesouros[ini - 1].x = xx;
 			tesouros[ini - 1].y = yy;
 			tesouros[ini - 1].xi = xi;
 			tesouros[ini - 1].yi = yi;
-			tesouros[ini - 1].tipo = selecao.tipo
-			
-			tesouros[ini - 1].subtipo = selecao.subtipo
-			
-			
-			tesouros[ini - 1].spr = new Sprite (xx,yy,tamanhoCelula,tamanhoCelula)
-			tesouros[ini - 1].spr.overlap(allSprites)
-			tesouros[ini - 1].spr.addImage(bauoff)
-			tesouros[ini - 1].spr.scale = 1.4
-			tesouros[ini - 1].spr.rotation = 90 * floor (random (0,3))
+			tesouros[ini - 1].tipo = selecao.tipo;
 
-			tesouros.entidade = tesouros[ini - 1]
-			return 1
+			tesouros[ini - 1].subtipo = selecao.subtipo;
 
+			tesouros[ini - 1].spr = new Sprite(xx, yy, tamanhoCelula, tamanhoCelula);
+			tesouros[ini - 1].spr.overlap(allSprites);
+			tesouros[ini - 1].spr.addImage(bauoff);
+			tesouros[ini - 1].spr.scale = 1.4;
+			tesouros[ini - 1].spr.rotation = 90 * floor(random(0, 2));
+
+			tesouros.entidade = tesouros[ini - 1];
+			return 1;
 		}
 	}
 
 	if (selecao.tipo == tipos.TRAP) {
-		if (selecao.subtipo == subtipos.SPIKESOFF)
-		
-		{
-			
-
-			var ini = traps.push(structuredClone(entidade));
-			
-			
-
-			traps[ini - 1].x = xx;
-			traps[ini - 1].y = yy;
-			traps[ini - 1].xi = xi;
-			traps[ini - 1].yi = yi;
-			traps[ini - 1].tipo = selecao.tipo
-			
-			traps[ini - 1].subtipo = selecao.subtipo
-			
-			
-			traps[ini - 1].spr = new Sprite (xx,yy,tamanhoCelula,tamanhoCelula)
-			traps[ini - 1].spr.overlap(allSprites)
-			traps[ini - 1].spr.addImage(spikesoff)
-			selecao.entidade = traps[ini - 1]
-
-			return 1
-		}
-		if (selecao.subtipo == subtipos.SPIKESON)
-		{
-
+		if (selecao.subtipo == subtipos.SPIKESOFF) {
 			var ini = traps.push(structuredClone(entidade));
 
 			traps[ini - 1].x = xx;
 			traps[ini - 1].y = yy;
 			traps[ini - 1].xi = xi;
 			traps[ini - 1].yi = yi;
-			traps[ini - 1].tipo = selecao.tipo
-			traps[ini - 1].subtipo = selecao.subtipo
-			traps[ini - 1].spr = new Sprite (xx,yy,tamanhoCelula,tamanhoCelula)
-			traps[ini - 1].spr.overlap(allSprites)
-			traps[ini - 1].spr.addImage(spikeson)
-			selecao.entidade = traps[ini - 1]
+			traps[ini - 1].tipo = selecao.tipo;
 
+			traps[ini - 1].subtipo = selecao.subtipo;
 
-			return 1
+			traps[ini - 1].spr = new Sprite(xx, yy, tamanhoCelula, tamanhoCelula);
+			traps[ini - 1].spr.overlap(allSprites);
+			traps[ini - 1].spr.addImage(spikesoff);
+			selecao.entidade = traps[ini - 1];
+
+			return 1;
+		}
+		if (selecao.subtipo == subtipos.SPIKESON) {
+			var ini = traps.push(structuredClone(entidade));
+
+			traps[ini - 1].x = xx;
+			traps[ini - 1].y = yy;
+			traps[ini - 1].xi = xi;
+			traps[ini - 1].yi = yi;
+			traps[ini - 1].tipo = selecao.tipo;
+			traps[ini - 1].subtipo = selecao.subtipo;
+			traps[ini - 1].spr = new Sprite(xx, yy, tamanhoCelula, tamanhoCelula);
+			traps[ini - 1].spr.overlap(allSprites);
+			traps[ini - 1].spr.addImage(spikeson);
+			selecao.entidade = traps[ini - 1];
+
+			return 1;
 		}
 
-		return 0 ;
+		return 0;
 	}
 	if (selecao.tipo === tipos.DECORACAO) {
 		var ini = decoracaoCima.push(structuredClone(entidade));
@@ -1802,7 +1868,7 @@ function criaEntidade(
 		inimigos[ini - 1].spr.addImage(selecao.img);
 		inimigos[ini - 1].spr.entidade = inimigos[ini - 1];
 		inimigos[ini - 1].spr.overlap(allSprites);
-		
+
 		selecao.entidade = inimigos[ini - 1];
 		selecao.spr = inimigos[ini - 1].spr;
 		return;
@@ -1899,7 +1965,6 @@ function criaEntidade(
 		}
 		paredes[xi][yi].spr.overlap(allSprites);
 
-		
 		paredes[xi][yi].spr.addImage(selecao.img);
 		// paredes[xi][yi].spr.scale = escala
 		selecao.entidade = paredes[xi][yi];

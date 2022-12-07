@@ -27,7 +27,7 @@ function criaGrade() { // linhas
 }
 function mousePressed() {
     if (mouseButton === RIGHT) {
-
+        dialogOn = !dialogOn
        
        // sisParticulas (mouse.x,mouse.y)
         //selecionaItem(getItemMapa(mouse.x,mouse.y))
@@ -264,6 +264,7 @@ function mouseClicked() {
                     break
                 
             }
+             doAiInimigos() // passa rodada
           //  doglitch()
             
         } else {
