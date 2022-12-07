@@ -241,6 +241,9 @@ function mapeiaMouse() {
         }
     }
 }
+
+
+
 function mouseClicked() {
 
     getItemPaleta()
@@ -259,9 +262,9 @@ function mouseClicked() {
                 case modos.CRIASALA:
                     criaSala (mouse.x, mouse.y,6,4)
                     break
-
-
+                
             }
+          //  doglitch()
             
         } else {
 
@@ -288,6 +291,60 @@ function mouseClicked() {
 
 
 }
+
+
+function doglitch ()
+{
+    setTimeout(
+        function (){
+            glitchmode = !glitchmode; 
+            console.log(glitchmode);
+        }, 50);  
+        setTimeout(
+            function (){
+                glitchmode = !glitchmode; 
+                console.log(glitchmode);
+            }, 20);
+            setTimeout(
+                function (){
+                    glitchmode = !glitchmode; 
+                    console.log(glitchmode);
+                }, 322);
+    setTimeout(
+        function (){
+            glitchmode = !glitchmode; 
+            console.log(glitchmode);
+        }, 100);
+        setTimeout(
+            function (){
+                glitchmode = !glitchmode; 
+                console.log(glitchmode);
+            }, 240);
+            setTimeout(
+                function (){
+                    glitchmode = !glitchmode; 
+                    console.log(glitchmode);
+                }, 370);
+
+                setTimeout(
+                    function (){
+                        glitchmode = !glitchmode; 
+                        console.log(glitchmode);
+                    }, 500);
+                    setTimeout(
+                        function (){
+                            glitchmode = !glitchmode; 
+                            console.log(glitchmode);
+                        }, 250);
+                        setTimeout(
+                            function (){
+                                glitchmode = !glitchmode; 
+                                console.log(glitchmode);
+                            }, 470);
+
+
+}
+
 function getItemPaleta(ncolunas = 4) {
     if (!mostraPaleta) 
         return;
@@ -529,13 +586,24 @@ function drawVida ()
     camera.off()
 
     push()
+
     vida.draw()
   
     blendMode(REMOVE)
     
     vidaoverlay.draw()
-   
+  
     pop()
+
+    if (glitchmode)
+    {   
+        
+        blendMode(DIFFERENCE)
+   }else{
+
+    blendMode(BLEND)    
+   }
+
     camera.on()
 
 }

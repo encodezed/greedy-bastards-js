@@ -42,6 +42,7 @@ let mostraPaleta = false;
 let inicializa = true;
 let tamanhoCelula = 64;
 let tamanhoTabuleiro = 50;
+let glitchmode = false
 
 let zoomatual = 2.5;
 let sprSelecionado;
@@ -875,7 +876,7 @@ function setup() {
 }
 
 function draw() {
-	var flutuacao = 0.03 * sin(frameCount * 8) + 1;
+	var flutuacao = 0.008 * sin(frame * 4) + 1;
 	clear();
 	camera.on();
 	camera.zoom = zoomatual;
@@ -1001,18 +1002,20 @@ function draw() {
 	}
 
 
-
+	
 	drawSpotlight()
 	drawVida()
 	drawUI()
 	camera.off(); // desliga acamera para fazer a ui
 
-	strokeWeight(8);
+
+
+
 	if (mostraPaleta) {
 		drawPaleta();
 	}
 
-	fill(20, 22, 26);
+	//fill(20, 22, 26);
 
 	text(
 		"Greedy Bastars - CatGirls Tail - maptool v0.5 - @zednaked",
@@ -1487,6 +1490,7 @@ function removeEntidade(_entidade) {
 		console.log("deletou um inimigo");
 		_entidade.tipo = tipos.VAZIO;
 		_entidade.spr.remove();
+		_entidade.sprSombra.remove();
 		inimigos.splice(_entidade.index, 1);
 	}
 	if (_entidade.tipo === tipos.ITEM) {
