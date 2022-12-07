@@ -938,7 +938,7 @@ function draw() {
 	if (Jogador.spr) {
 		push();
 
-		tint(0, 0, 0, 220);
+		tint(0, 0, 0, 210);
 		Jogador.sprSombra.scale = flutuacao + 0.05;
 		Jogador.sprSombra.draw();
 
@@ -953,12 +953,13 @@ function draw() {
 	}
 	if (!inicializa) {
 		for (inimigo of inimigos) {
-			push();
+		
 
-			tint(0, 0, 0, 232);
+		if ((Jogador.spr.mirror.x == true && inimigo.xi >= Jogador.xi) || (Jogador.spr.mirror.x == false && inimigo.xi <= Jogador.xi))
+		{	push();
+			tint(0, 0, 0, 210);
 			inimigo.sprSombra.scale = flutuacao + 0.02;
 			inimigo.sprSombra.draw();
-
 			pop();
 
 			inimigo.spr.scale = inimigo.variacao + flutuacao + 0.02;
@@ -969,7 +970,10 @@ function draw() {
 				inimigo.spr.draw();
 				pop();
 			} else {
+				
 				inimigo.spr.draw();
+				
+			}
 			}
 		}
 
@@ -1002,14 +1006,33 @@ function draw() {
 	}
 
 
-	
+	if (Jogador.spr.mirror.x == true){
+		camera.off()
+		
+		fill(0,0,0,30)
+		rect (0,0,width/2-64,height)
+		noStroke()
+		
+		camera.on()
+
+	}else{
+		camera.off()
+		
+		fill(0,0,0,30)
+		rectMode(CORNER)
+		rect ((width/2)+64,0,width/2,height)
+		noStroke()
+		
+		camera.on()
+
+	}
+
 	drawSpotlight()
 	drawVida()
 	drawUI()
 	camera.off(); // desliga acamera para fazer a ui
 
-
-
+	
 
 	if (mostraPaleta) {
 		drawPaleta();
@@ -1224,7 +1247,7 @@ const horizontal = 1;
 function moveEntidade(_entidade, _x = 0, _y = 0) {
 	
 	if (_y > 0) {
-		//console.log("pra baixo")
+		console.log("pra baixo")
 		for (inimigo of inimigos) {
 			if (inimigo.xi == _entidade.xi && inimigo.yi == _entidade.yi + 1) {
 				sisParticulas(inimigo.x, inimigo.y)
@@ -1261,7 +1284,7 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 			console.log("colidiu com o jogador");
 			return 0;
 		}
-		if (paredes[xi][_entidade.yi + 1].tipo == tipos.PAREDE) {
+		if (paredes[_entidade.xi][_entidade.yi + 1].tipo == tipos.PAREDE) {
 			console.log("colidiu com uma parede");
 			return 0;
 		}
@@ -1480,7 +1503,7 @@ function drawPaleta() {
 }
 
 function removeEntidade(_entidade) {
-	console.log(_entidade.tipo);
+	//console.log(tipon[_entidade.tipo]);
 	if (_entidade.tipo === tipos.PAREDE) {
 		_entidade.tipo = tipos.VAZIO;
 		_entidade.spr.remove();
