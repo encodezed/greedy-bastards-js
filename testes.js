@@ -38,13 +38,14 @@ TODOS:
 /**
  * globais
  */
-let morreu = false
+let morreu = false;
 let dialogOn = false;
 let mostraPaleta = false;
 let inicializa = true;
 let tamanhoCelula = 64;
 let tamanhoTabuleiro = 25;
 let glitchmode = false;
+var gSombras;
 
 let zoomatual = 2.5;
 let sprSelecionado;
@@ -58,6 +59,7 @@ var chaos = [];
 var paleta = [];
 var mapa = [];
 var imgOverlay;
+var textosFlutuantes = [];
 
 /**
  * ENUMS
@@ -111,7 +113,7 @@ subtipos = {
 	SPIKESON: n++,
 	BAUON: n++,
 	BAUOFF: n++,
-	SANGUE: n++
+	SANGUE: n++,
 };
 
 n = 0;
@@ -247,15 +249,20 @@ let ladon = {
 	3: "DIREITA",
 };
 
-
-let gSangues 
-function doSangue (x,y,cor = 0)
-{
-	let sangue = new Sprite(x,y,tamanhoCelula,tamanhoCelula)
-	sangue.addImage(sangues[floor(random (0,7))])
-	sangue.scale = (random (0.7,1.4))
-	sangue.overlap(allSprites)
-	gSangues.push (sangue)
+let gSangues;
+function doSangue(x, y, cor = 0) {
+	if (floor(random(-1, 1))) x -= 32;
+	if (floor(random(-1, 1))) x += 32;
+	if (floor(random(-1, 1))) y -= 32;
+	if (floor(random(-1, 1))) y += 32;
+	let sangue = new Sprite(x, y, tamanhoCelula, tamanhoCelula);
+	sangue.addImage(sangues[floor(random(0, 7))]);
+	sangue.img.scale = random(0.7, 1.4);
+	sangue.mirror.x = floor(random(-1, 1));
+	//sangue.mirror.y =floor(random (-1,1))
+	sangue.cor = cor;
+	sangue.overlap(allSprites);
+	gSangues.push(sangue);
 }
 
 /**
@@ -279,16 +286,16 @@ function doAiInimigos() {
 
 let gParticulas;
 
-function sisParticulas(_x, _y, textura = imgFumaca) {
-	for (a = 0; a < 10; a++) {
-		let sprFumacinha = new Sprite(_x, _y, 32);
-		sprFumacinha.scale = 1.5;
+function sisParticulas(_x, _y, textura = sangues[floor(random(0,sangues.length))]) {
+	for (a = 0; a < 8; a++) {
+		let sprFumacinha = new Sprite(_x, _y, 50);
+		//sprFumacinha.img.scale = 3;
 		sprFumacinha.overlap(allSprites);
-		sprFumacinha.rotation = random(360);
-		sprFumacinha.direction = random(0, -180);
-		sprFumacinha.speed = random(5, 10);
-		sprFumacinha.life = random(3, 4);
-		sprFumacinha.rotationSpeed = 380;
+		//sprFumacinha.rotation = random(360);
+		sprFumacinha.direction = random(0, -380);
+		sprFumacinha.speed = random(8, 15);
+		sprFumacinha.life = random(5, 7);
+		sprFumacinha.rotationSpeed = 500;
 		sprFumacinha.addImage(textura);
 		gParticulas.push(sprFumacinha);
 	}
@@ -649,8 +656,8 @@ function criaItem(nome, tipo, tipoitem, min, max, img, historia = "") {
  * com varias celulas dentro , com o tipo INIMIGO
  *
  */
-let sangues =[]
-
+let sangues = [];
+var imgfog 
 function preload() {
 	/**
 	 * inicializa as imagens
@@ -658,11 +665,12 @@ function preload() {
 	 * o mesmo sera feito com paredes etc... o que muda é o tipo
 	 */
 
-	 gSangues = new Group()
-	 const dir = 'Arte/Sprites/Misc/Sangues';
-	 
-	
+	gSangues = new Group();
 
+	gSombras = new Group();
+
+	const dir = "Arte/Sprites/Misc/Sangues";
+	imgfog = loadImage("Arte/fog.png") 
 	longa = loadImage("Arte/Sprites/Item/Longa2.png");
 	pocaovida = loadImage("Arte/Sprites/Item/PocaoVida.png");
 	escudo = loadImage("Arte/Sprites/Item/EscudoSimples.png");
@@ -800,9 +808,6 @@ function preload() {
 		"Pocao de vida"
 	);
 
-
-	
-
 	for (a = 0; a < numDeco; a++) {
 		let imgDeco = loadImage("Arte/Sprites/Misc/top_" + a + ".png");
 
@@ -814,18 +819,16 @@ function preload() {
 		});
 	}
 
-	for (a = 0; a < 8; a++)
-	{
-		let sangue = loadImage(dir +"/"+ a + ".png");
-		sangues.push (sangue)
-	   //sangues.push(dir + a )
-	   paleta.push({
-		img: sangue,
-		tipo: tipos.DECORACAO,
-		subtipo: subtipos.SANGUE,
-		escala: 0.5,
-	});
-
+	for (a = 0; a < 8; a++) {
+		let sangue = loadImage(dir + "/" + a + ".png");
+		sangues.push(sangue);
+		//sangues.push(dir + a )
+		paleta.push({
+			img: sangue,
+			tipo: tipos.DECORACAO,
+			subtipo: subtipos.SANGUE,
+			escala: 0.5,
+		});
 	}
 
 	paleta.push({
@@ -900,41 +903,74 @@ function getItemTipo(_tipo, _subtipo) {
 
 function setup() {
 	gspr = new Group();
-	createCanvas(window.innerWidth, 800,'pixelated');
+	createCanvas(window.innerWidth, 800, "pixelated");
+	sprFog = new Sprite(imgfog,0,0)
+	sprFog.img.scale = 3
+	sprFog.overlap(allSprites)
 	//noSmooth(); // importante sempre usar
-
+	gSangues.overlap(allSprites)
+	gParticulas.overlap(allSprites)
+	gSombras.overlap(allSprites)
 	rectMode(RADIUS);
 	strokeWeight(2);
 }
 
+function morre() {
+	if (!morreu) return 0;
+	camera.off();
+	push();
+	fill(10, 10, 10, 150);
+	rect(0, height / 2, width, height);
 
-function morre ()
-{
-	if (!morreu) return 0
-	camera.off ()
-	push()
-	fill (10,10,10,150)
-	rect (0,height/2,width,height)
-	
-	fill (10,10,10,200)
-	rect (0,height/2,width,100)
+	fill(10, 10, 10, 200);
+	rect(0, height / 2, width, 100);
 
-	fill (255,0,0,200)
-	textAlign(CENTER)
-	textFont(fontegoteca)
-	textSize (100)
-	text ("Mors Immatura",width/2 , height/2+20)
-	pop()
-	camera.on()
-
+	fill(255, 0, 0, 200);
+	textAlign(CENTER);
+	textFont(fontegoteca);
+	textSize(100);
+	text("Mors Immatura", width / 2, height / 2 + 20);
+	pop();
+	camera.on();
 }
+
+function doTextoFlutuante() {
+	if (!textosFlutuantes.length) return 0;
+	//
+	n = 0;
+
+	for (texto of textosFlutuantes) {
+		if (texto.y < texto.yInicial - 20) {
+			textosFlutuantes.splice(n, 1);
+		}
+		push();
+		fill(255, 0, 0);
+		textFont(fonte);
+		stroke(1);
+		text(texto.texto, texto.x, texto.y);
+
+		pop();
+
+		texto.y--;
+		n++;
+	}
+}
+
+var blink = false
+var tmr = 0 
+
+fade = true
+var tmr2 = 0
 
 function draw() {
 	var flutuacao = 0.008 * sin(frame * 4) + 1;
 	clear();
-	
+
 	camera.on();
 	camera.zoom = zoomatual;
+
+
+
 
 	if (inicializa) {
 		geraGrade();
@@ -984,9 +1020,8 @@ function draw() {
 		}
 		criaEntidadeSala(salas[0], tipos.TRAP, subtipos.SPIKESOFF);
 		criaEntidadeSala(salas[0], tipos.TESOURO, subtipos.BAUOFF);
-		
+
 		iniUi();
-		
 		
 	}
 	allSprites.draw();
@@ -996,15 +1031,21 @@ function draw() {
 			chao.draw();
 		}
 	}
+	
 	for (trap of traps) {
-
 		trap.spr.draw();
 	}
-	push ()
-	tint (255,255,255,225)
-	gSangues.draw()
-
+	push()
+	tint (255,255,255,10)
+	gSombras.draw()
 	pop()
+
+	push();
+	tint(255, 255, 255, 225);
+	gSangues.draw();
+
+	pop();
+	
 	for (_tesouro of tesouros) {
 		_tesouro.spr.draw();
 	}
@@ -1012,12 +1053,12 @@ function draw() {
 		push();
 
 		tint(0, 0, 0, 210);
-		Jogador.sprSombra.scale = flutuacao + 0.05;
+		Jogador.sprSombra.img.scale.y = flutuacao + 0.05;
 		Jogador.sprSombra.draw();
 
 		pop();
 
-		Jogador.spr.scale = flutuacao + 0.05;
+		Jogador.spr.img.scale.y = flutuacao + 0.05;
 		/**
 		 * funciona assim, eu quero a variação de 0.1 no numero 1 o 2 é a velocidade
 		 *
@@ -1032,15 +1073,15 @@ function draw() {
 			) {
 				push();
 				tint(0, 0, 0, 210);
-				inimigo.sprSombra.scale = flutuacao + 0.02;
+				inimigo.sprSombra.img.scale.y = flutuacao + 0.02;
 				inimigo.sprSombra.draw();
 				pop();
 
-				inimigo.spr.scale = inimigo.variacao + flutuacao + 0.02;
+				inimigo.spr.img.scale.y = inimigo.variacao + flutuacao + 0.02;
 
 				if (inimigo.engaged) {
 					push();
-					tint(255 - flutuacao, 180, 180, 252);
+					tint(255 - flutuacao, 100, 100, 252);
 					inimigo.spr.draw();
 					pop();
 				} else {
@@ -1093,19 +1134,68 @@ function draw() {
 
 		camera.on();
 	}
-
+	doTextoFlutuante();
 	doDialogo();
 	drawSpotlight();
 	drawVida();
 	drawUI();
-	morre()
+	morre();
+
+
 	camera.off(); // desliga acamera para fazer a ui
+	if (fade)
+	{
+		if (tmr > 10)
+		{
+			fade = false
+			tmr = 0
+		}
+		
+		fill(0)
+		rect (0,0,width,height)
+		tmr ++
+	}
+	if (blink)
+	{
+		if (tmr2 > 1) 
+		{
+			blink = false
+			tmr3 = 0
+		}
+		fill(150,160)
+		rect (0,0,width,height)
+		tmr2 ++
+	}
+	push()
+	camera.off()
+	tint(222,222,255,35)
+	blendMode(DODGE)
+	//imgfog.resize(imgfog.width imgfog.height + flutuacao*100)
+	//image(imgfog,0,0,width,height)
+
+		sprFog.x += cos (frame)
+		sprFog.img.scale -= cos (frame) /500
+		sprFog.draw()
+	camera.on()
+	pop()
 
 	if (mostraPaleta) {
 		drawPaleta();
 	}
 
 	//fill(20, 22, 26);
+}
+
+function doBlink ()
+{
+	tmr2 = 0
+	blink = true
+}
+
+function doFade ()
+{
+	tmr = 0
+	fade = true
 }
 
 /**
@@ -1317,14 +1407,13 @@ function andaDirecao(entidade1, entidade2) {
 		}
 	} else {
 		p(entidade1.nome + " esta colado em " + entidade2.nome);
-		sisParticulas (Jogador.x, Jogador.y)
-		vidaoverlay.y += 10
-		if (vidaoverlay.y >= 710 ) morreu = true
-		
+		sisParticulas(Jogador.x, Jogador.y);
+		vidaoverlay.y += 10;
+		if (vidaoverlay.y >= 710) morreu = true;
+		criaTextoFlutuante("-20", Jogador.x, Jogador.y);
 
-
-		doSangue(Jogador.x, Jogador.y)
-		
+		doSangue(Jogador.x, Jogador.y);
+		doBlink()
 		return 0;
 	}
 
@@ -1351,19 +1440,17 @@ function doMovimento(_entidade, xi, yi, _velocidade = 200) {
 				"easeInOutSin"
 			)
 			.startTween();
-		if (_entidade.tipo == tipos.PLAYER)
-			{
-				p5.tween.manager
-					.addTween(camera, "movimento")
-					.addMotion(
-						"x",
-						camera.x + xi * tamanhoCelula,
-						_velocidade,
-						"easeInOutSin"
-					)
-					.startTween();
-		
-			}		
+		if (_entidade.tipo == tipos.PLAYER) {
+			p5.tween.manager
+				.addTween(camera, "movimento")
+				.addMotion(
+					"x",
+					camera.x + xi * tamanhoCelula,
+					_velocidade,
+					"easeInOutSin"
+				)
+				.startTween();
+		}
 	}
 	if (yi) {
 		p5.tween.manager
@@ -1384,22 +1471,32 @@ function doMovimento(_entidade, xi, yi, _velocidade = 200) {
 				"easeInOutSin"
 			)
 			.startTween();
-		if (_entidade.tipo == tipos.PLAYER)
-			{
-				p5.tween.manager
-					.addTween(camera, "movimento")
-					.addMotion(
-						"y",
-						camera.y + yi * tamanhoCelula,
-						_velocidade,
-						"easeInOutSin"
-					)
-					.startTween();
-		
-			}	
+		if (_entidade.tipo == tipos.PLAYER) {
+			p5.tween.manager
+				.addTween(camera, "movimento")
+				.addMotion(
+					"y",
+					camera.y + yi * tamanhoCelula,
+					_velocidade,
+					"easeInOutSin"
+				)
+				.startTween();
+		}
 	}
-	
 }
+
+function criaTextoFlutuante(texto, x, y) {
+	var rndx = random(0, 20);
+	var rndy = random(0, 20);
+
+	textosFlutuantes.push({
+		texto: texto,
+		x: x - rndx,
+		y: y - rndy,
+		yInicial: y - rndy,
+	});
+}
+
 
 const vertical = 0;
 const horizontal = 1;
@@ -1414,10 +1511,13 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 	if (_y > 0) {
 		for (inimigo of inimigos) {
 			if (inimigo.xi == _entidade.xi && inimigo.yi == _entidade.yi + 1) {
-				//doSangue(inimigo.x, inimigo.y)
-				sisParticulas(inimigo.x, inimigo.y);
 				
+				sisParticulas(inimigo.x, inimigo.y);
+				criaTextoFlutuante("-10", inimigo.x, inimigo.y);
+				inimigo.tipo = tipos.INIMIGO;
+				doSangue(inimigo.x,inimigo.y)
 				removeEntidade(inimigo);
+
 				console.log("colidiu como um inimigo");
 				return 0;
 			}
@@ -1433,6 +1533,7 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 					return 0;
 				} else {
 					sisParticulas(Jogador.x, Jogador.y + tamanhoCelula);
+					doSangue(_trap.x,_trap.y)
 					console.log("colidiu com uma trap aberta");
 					//return 0
 				}
@@ -1441,7 +1542,7 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 
 		if (Jogador.xi == _entidade.xi && Jogador.yi == _entidade.yi + 1) {
 			console.log("colidiu com o jogador");
-			
+
 			return 0;
 		}
 		if (paredes[_entidade.xi][_entidade.yi + 1].tipo == tipos.PAREDE) {
@@ -1466,8 +1567,9 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 					console.log("colidiu com uma trap fechada");
 					return 0;
 				} else {
-					sisParticulas(Jogador.x, Jogador.y - tamanhoCelula);
+					//	sisParticulas(Jogador.x, Jogador.y - tamanhoCelula);
 					console.log("colidiu com uma trap aberta");
+					doSangue(_trap.x,_trap.y)
 					//return 0
 				}
 			}
@@ -1476,7 +1578,10 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 		for (inimigo of inimigos) {
 			if (inimigo.xi == _entidade.xi && inimigo.yi == _entidade.yi - 1) {
 				sisParticulas(inimigo.x, inimigo.y);
+				criaTextoFlutuante("-10", inimigo.x, inimigo.y);
+				doSangue(inimigo.x,inimigo.y)
 				removeEntidade(inimigo);
+
 				console.log("colidiu como um inimigo");
 				return 0;
 			}
@@ -1505,13 +1610,12 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 					getItemTipo(tipos.TRAP, subtipos.SPIKESON);
 					criaEntidade(_trap.spr.x, _trap.spr.y);
 					removeEntidade(_trap);
-					console.log("colidiu com uma trap fechada A DIREITA");
 					selecao.entidade.subtipo = subtipos.SPIKESON;
-					console.table(traps);
+			
 					return 0;
 				} else {
 					sisParticulas(Jogador.x + tamanhoCelula, Jogador.y);
-
+					doSangue(_trap.x,_trap.y)
 					console.log("colidiu com uma trap aberta");
 					//return 0
 				}
@@ -1520,6 +1624,8 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 		for (inimigo of inimigos) {
 			if (inimigo.xi == _entidade.xi + 1 && inimigo.yi == _entidade.yi) {
 				sisParticulas(inimigo.x, inimigo.y);
+				criaTextoFlutuante("-10", inimigo.x, inimigo.y);
+				doSangue(inimigo.x,inimigo.y)
 				removeEntidade(inimigo);
 				console.log("colidiu como um inimigo");
 				return 0;
@@ -1549,6 +1655,7 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 				if (_trap.subtipo != subtipos.SPIKESON) {
 					getItemTipo(tipos.TRAP, subtipos.SPIKESON);
 					criaEntidade(_trap.spr.x, _trap.spr.y);
+					doSangue(_trap.x,_trap.y)
 					removeEntidade(_trap);
 					console.log("colidiu com uma trap fechada");
 					return 0;
@@ -1564,7 +1671,10 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 		for (inimigo of inimigos) {
 			if (inimigo.xi == _entidade.xi - 1 && inimigo.yi == _entidade.yi) {
 				sisParticulas(inimigo.x, inimigo.y);
+				doSangue(inimigo.x,inimigo.y)
+				criaTextoFlutuante("-10", inimigo.x, inimigo.y);
 				removeEntidade(inimigo);
+				
 				console.log("colidiu como um inimigo");
 				return 0;
 			}
@@ -1654,24 +1764,26 @@ function drawPaleta() {
 }
 
 function removeEntidade(_entidade) {
-	//console.log(tipon[_entidade.tipo]);
+	//console.log(_entidade.tipo)
+	//console.log(tipos.INIMIGO)
+
 	if (_entidade.tipo === tipos.PAREDE) {
 		_entidade.tipo = tipos.VAZIO;
 		_entidade.spr.remove();
 	}
 
-	if (_entidade.tipo === tipos.INIMIGO) {
+	if (_entidade.tipo == tipos.INIMIGO) {
 		console.log("deletou um inimigo");
 		_entidade.tipo = tipos.VAZIO;
 		_entidade.spr.remove();
 		_entidade.sprSombra.remove();
-		inimigos.splice(_entidade.index, 1);
+		inimigos.splice(inimigos.indexOf(_entidade), 1);
 	}
 	if (_entidade.tipo === tipos.ITEM) {
 		console.log("deletou um item");
 		_entidade.tipo = tipos.VAZIO;
 		_entidade.spr.remove();
-		itensnomapa.splice(_entidade.index, 1);
+		itensnomapa.splice(itensnomapa.indexOf(_entidade), 1);
 	}
 
 	if (_entidade.tipo === tipos.TRAP) {
@@ -1679,7 +1791,7 @@ function removeEntidade(_entidade) {
 		_entidade.tipo = tipos.VAZIO;
 		_entidade.subtipo = subtipos.VAZIO;
 		_entidade.spr.remove();
-		traps.splice(_entidade.index, 1);
+		traps.splice(traps.indexOf(_entidade), 1);
 	}
 }
 
@@ -1740,7 +1852,7 @@ function criaEntidade(
 			tesouros[ini - 1].spr.overlap(allSprites);
 			tesouros[ini - 1].spr.addImage(bauoff);
 			tesouros[ini - 1].spr.scale = 1.4;
-			tesouros[ini - 1].spr.rotation = 90 * floor(random(0, 2));
+			tesouros[ini - 1].spr.rotation = 90;
 
 			tesouros.entidade = tesouros[ini - 1];
 			return 1;
@@ -1864,6 +1976,8 @@ function criaEntidade(
 	 * Se for do tipo INIMIGO
 	 */
 	if (selecao.tipo === tipos.INIMIGO) {
+		yy -= 35
+		
 		for (inimigo of inimigos) {
 			if (inimigo.xi == xi && inimigo.yi == yi) {
 				console.log("ja tem outro inimigo");
@@ -1901,15 +2015,17 @@ function criaEntidade(
 		inimigos[ini - 1].spr.addImage(selecao.img);
 		inimigos[ini - 1].spr.entidade = inimigos[ini - 1];
 		inimigos[ini - 1].spr.overlap(allSprites);
-
+			gSombras.push(inimigos[ini - 1].sprSombra)
 		selecao.entidade = inimigos[ini - 1];
 		selecao.spr = inimigos[ini - 1].spr;
-		return;
+		return inimigos[ini - 1];
 	}
 	/**
 	 * se for do tipo PLAYER
 	 */
 	if (selecao.tipo === tipos.PLAYER) {
+		xx += 3
+		yy -= 15
 		if (Jogador.spr != 0) {
 			Jogador.spr.remove();
 			Jogador.sprSombra.remove();
@@ -1929,7 +2045,7 @@ function criaEntidade(
 			tamanhoCelula
 		);
 		Jogador.sprSombra.overlap(allSprites);
-
+			gSombras.push(Jogador.sprSombra)
 		Jogador.sprSombra.mirror.y = true;
 
 		Jogador.spr = new Sprite(xx, yy, tamanhoCelula, tamanhoCelula);
