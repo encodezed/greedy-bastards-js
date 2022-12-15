@@ -38,7 +38,7 @@ TODOS:
 /**
  * globais
  */
-
+let morreu = false
 let dialogOn = false;
 let mostraPaleta = false;
 let inicializa = true;
@@ -900,18 +900,42 @@ function getItemTipo(_tipo, _subtipo) {
 
 function setup() {
 	gspr = new Group();
-	createCanvas(window.innerWidth, 800);
-	noSmooth(); // importante sempre usar
+	createCanvas(window.innerWidth, 800,'pixelated');
+	//noSmooth(); // importante sempre usar
 
 	rectMode(RADIUS);
 	strokeWeight(2);
 }
 
+
+function morre ()
+{
+	if (!morreu) return 0
+	camera.off ()
+	push()
+	fill (10,10,10,150)
+	rect (0,height/2,width,height)
+	
+	fill (10,10,10,200)
+	rect (0,height/2,width,100)
+
+	fill (255,0,0,200)
+	textAlign(CENTER)
+	textFont(fontegoteca)
+	textSize (100)
+	text ("Mors Immatura",width/2 , height/2+20)
+	pop()
+	camera.on()
+
+}
+
 function draw() {
 	var flutuacao = 0.008 * sin(frame * 4) + 1;
 	clear();
+	
 	camera.on();
 	camera.zoom = zoomatual;
+
 	if (inicializa) {
 		geraGrade();
 		tamanhosalainicial = 6;
@@ -960,7 +984,10 @@ function draw() {
 		}
 		criaEntidadeSala(salas[0], tipos.TRAP, subtipos.SPIKESOFF);
 		criaEntidadeSala(salas[0], tipos.TESOURO, subtipos.BAUOFF);
+		
 		iniUi();
+		
+		
 	}
 	allSprites.draw();
 
@@ -1071,6 +1098,7 @@ function draw() {
 	drawSpotlight();
 	drawVida();
 	drawUI();
+	morre()
 	camera.off(); // desliga acamera para fazer a ui
 
 	if (mostraPaleta) {
@@ -1290,6 +1318,11 @@ function andaDirecao(entidade1, entidade2) {
 	} else {
 		p(entidade1.nome + " esta colado em " + entidade2.nome);
 		sisParticulas (Jogador.x, Jogador.y)
+		vidaoverlay.y += 10
+		if (vidaoverlay.y >= 710 ) morreu = true
+		
+
+
 		doSangue(Jogador.x, Jogador.y)
 		
 		return 0;

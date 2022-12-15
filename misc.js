@@ -460,45 +460,16 @@ function carregaMapa() {
 }
 
 
-function makeShadow(img, sigma, shadowColor, opacity) {
-  // Gaussian goes to approx. 0 at 3sigma
-  // away from the mean; pad image with
-  // 3sigma on all sides to give space
-  const newW = img.width + 6 * sigma;
-  const newH = img.height + 6 * sigma;
-  const g = createGraphics(newW, newH);
-  
-  g.imageMode(CENTER);
-  g.translate(newW/2, newH/2);
-  //g.tint(0, 0, 0, );
-  g.image(img, 0, 0);
-  g.filter(BLUR, sigma);
-  
-  const shadow = g.get();
-  const c = color(shadowColor);
-  shadow.loadPixels();
-  const numVals = 4 * shadow.width * shadow.height;
-  for (let i = 0; i < numVals; i+=4) {
-    shadow.pixels[i + 0] = c.levels[0];
-    shadow.pixels[i + 1] = c.levels[1];
-    shadow.pixels[i + 2] = c.levels[2];
-    shadow.pixels[i + 3] *= opacity;
-  }
-  shadow.updatePixels();
-  
-  g.remove();
-  return shadow;
-}
-
 
 function drawUI ()
 {
+
+
 camera.off ()
-
-
 
 vial.draw()
 vial2.draw()
+
 push()
 fill (155)
 textSize(20)
@@ -524,6 +495,7 @@ camera.on()
 
 function iniUi()
 {
+    camera.off()
     imgspotlight = loadImage("Arte/UI/spotlight.png")
 
     imggreedynomicon = loadImage ("Arte/UI/greedynomicon.png")
@@ -533,37 +505,40 @@ function iniUi()
     fontegoteca = loadFont("/fontes/gothic.ttf")
 
     vial = new Sprite (loadImage("Arte/UI/vial.png"))
+    
     vial.overlap (allSprites)
     vial.x = 90
     vial.y = height - 90
-    vial.scale = 2.5
+    vial.img.scale =2.5
 
     vial2 = new Sprite (loadImage("Arte/UI/vial.png"))
     vial2.overlap (allSprites)
     vial2.x = width-90
     vial2.y = height - 90
-    vial2.scale = 2.5
+    vial2.img.scale = 2.5
 
     vida = new Sprite (loadImage("Arte/UI/vida.png"))
     vida.overlap (allSprites)
     vida.x = 90
     vida.y = height - 90
-    vida.scale = 2.8
+    vida.img.scale = 2.8
 
 
     vidaoverlay = new Sprite (loadImage("Arte/UI/vida.png"))
     vidaoverlay.overlap (allSprites)
     vidaoverlay.x = 90
-    vidaoverlay.y = height - 140
-    vidaoverlay.scale = 2.8
+    vidaoverlay.y = height - 90-110
+  
+    vidaoverlay.img.scale = 2.8
 
 
     spotlight = new Sprite(imgspotlight)
     spotlight.x =width/2
     spotlight.y = height/2
-    spotlight.scale = 0.8+ (width/ 2100)
+    spotlight.img.scale = 0.8+ (width/ 2100)
 
     spotlight.static = true
+    camera.on()
    
 
 }
