@@ -114,6 +114,8 @@ subtipos = {
 	BAUON: n++,
 	BAUOFF: n++,
 	SANGUE: n++,
+	BELMEGOF: n++,
+	GOBLIN: n++
 };
 
 n = 0;
@@ -152,6 +154,7 @@ selecao = {
 	subtipo: -1,
 	entidade: 0,
 };
+
 
 oSala = {
 	x: 0,
@@ -316,7 +319,16 @@ function criaEntidadeSala(sala, tipo, subtipo, x, y) {
 		criaEntidade(vmeiosala - 3, hmeiosala - 3, 1.25, -1, -1, true);
 	}
 	if (tipo == tipos.INIMIGO) {
-		getItemTipo(tipos.INIMIGO, subtipos.VAZIO);
+
+		if (floor (random (-1,2))){
+			getItemTipo(tipos.INIMIGO, subtipos.GOBLIN);
+
+		}else{
+
+			getItemTipo(tipos.INIMIGO, subtipos.BELMEGOF)
+		}
+
+		
 		criaEntidade(darknumberx, darknumbery, 1.25, -1, -1, true);
 		selecao.entidade.variacao = random(0, 0.2);
 		_mirror = floor(random(-1, 2));
@@ -692,7 +704,7 @@ function preload() {
 
 	player = loadImage("Arte/Sprites/Player/meninagato/MGFULL.png");
 	goblin = loadImage("Arte/Sprites/Goblin/0 2.png");
-
+	belmegof = loadImage("Arte/Sprites/belmegof/bel1.png");
 	spikeson = loadImage("Arte/traps/spikeson.png");
 	spikesoff = loadImage("Arte/traps/spikesoff.png");
 	bauoff = loadImage("Arte/traps/bauoff.png");
@@ -710,7 +722,14 @@ function preload() {
 	paleta.push({
 		img: goblin,
 		tipo: tipos.INIMIGO,
-		subtipo: subtipos.VAZIO,
+		subtipo: subtipos.GOBLIN,
+		escala: -1,
+	});
+
+	paleta.push({
+		img: belmegof,
+		tipo: tipos.INIMIGO,
+		subtipo: subtipos.BELMEGOF,
 		escala: -1,
 	});
 	paleta.push({
@@ -986,36 +1005,36 @@ function draw() {
 		camera.x = (tamanhoTabuleiro / 2) * tamanhoCelula + 2 * tamanhoCelula;
 		camera.y = (tamanhoTabuleiro / 2) * tamanhoCelula + 2 * tamanhoCelula;
 
-		criaEntidadeSala(salas[0], tipos.PLAYER, subtipos.VAZIO);
+		criaEntidadeSala(salas[0], tipos.PLAYER, subtipos.GOBLIN);
 
-		criaEntidadeSala(salas[0], tipos.INIMIGO, subtipos.VAZIO);
+		criaEntidadeSala(salas[0], tipos.INIMIGO, subtipos.BELMEGOF);
 
-		criaEntidadeSala(salas[0], tipos.INIMIGO, subtipos.VAZIO);
+		criaEntidadeSala(salas[0], tipos.INIMIGO, subtipos.GOBLIN);
 
-		criaEntidadeSala(salas[0], tipos.INIMIGO, subtipos.VAZIO);
+		criaEntidadeSala(salas[0], tipos.INIMIGO, subtipos.BELMEGOF);
 
 		for (porta of salas[0].portas) {
 			if (porta == lados.CIMA)
-				criaEntidadeSala(criaSalaCima(salas[0]), tipos.INIMIGO, subtipos.VAZIO);
+				criaEntidadeSala(criaSalaCima(salas[0]), tipos.INIMIGO, subtipos.BELMEGOF);
 
 			if (porta == lados.BAIXO)
 				criaEntidadeSala(
 					criaSalaBaixo(salas[0]),
 					tipos.INIMIGO,
-					subtipos.VAZIO
+					subtipos.BELMEGOF
 				);
 
 			if (porta == lados.ESQUERDA)
 				criaEntidadeSala(
 					criaSalaEsquerda(salas[0]),
 					tipos.INIMIGO,
-					subtipos.VAZIO
+					subtipos.BELMEGOF
 				);
 			if (porta == lados.DIREITA)
 				criaEntidadeSala(
 					criaSalaDireita(salas[0]),
 					tipos.INIMIGO,
-					subtipos.VAZIO
+					subtipos.BELMEGOF
 				);
 		}
 		criaEntidadeSala(salas[0], tipos.TRAP, subtipos.SPIKESOFF);
@@ -1047,13 +1066,21 @@ function draw() {
 	pop();
 	
 	for (_tesouro of tesouros) {
+		
+
+		push()
+		tint (0,0,0,210)
+		_tesouro.sprSombra.draw()
+		pop()
 		_tesouro.spr.draw();
+	
+	
 	}
 	if (Jogador.spr) {
 		push();
 
 		tint(0, 0, 0, 210);
-		Jogador.sprSombra.img.scale.y = flutuacao + 0.05;
+		Jogador.sprSombra.img.scale = flutuacao + 0.05;
 		Jogador.sprSombra.draw();
 
 		pop();
@@ -1073,11 +1100,11 @@ function draw() {
 			) {
 				push();
 				tint(0, 0, 0, 210);
-				inimigo.sprSombra.img.scale.y = flutuacao + 0.02;
+				inimigo.sprSombra.img.scale = flutuacao + 0.02;
 				inimigo.sprSombra.draw();
 				pop();
 
-				inimigo.spr.img.scale.y = inimigo.variacao + flutuacao + 0.02;
+				inimigo.spr.img.scale = inimigo.variacao + flutuacao + 0.02;
 
 				if (inimigo.engaged) {
 					push();
@@ -1510,7 +1537,8 @@ const horizontal = 1;
 function moveEntidade(_entidade, _x = 0, _y = 0) {
 	if (_y > 0) {
 		for (inimigo of inimigos) {
-			if (inimigo.xi == _entidade.xi && inimigo.yi == _entidade.yi + 1) {
+
+			if (inimigo.xi == _entidade.xi && inimigo.yi == _entidade.yi + 1 && _entidade.tipo == tipos.PLAYER ) {
 				
 				sisParticulas(inimigo.x, inimigo.y);
 				criaTextoFlutuante("-10", inimigo.x, inimigo.y);
@@ -1519,6 +1547,18 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 				removeEntidade(inimigo);
 
 				console.log("colidiu como um inimigo");
+				return 0;
+			}
+			if (inimigo.xi == _entidade.xi  && inimigo.yi == _entidade.yi + 1 && _entidade.tipo == tipos.INIMIGO ) {
+				criaTextoFlutuante("Bloqueado !", inimigo.x, inimigo.y);
+			
+				console.log("inimigo colidiu como um inimigo - de dentro moveEntidade");
+				return 0;
+			}
+			if (inimigo.xi == _entidade.xi  && inimigo.yi == _entidade.yi + 1 && _entidade.tipo == tipos.PAREDE ) {
+				criaTextoFlutuante("Bloqueado !", inimigo.x, inimigo.y);
+			
+				console.log("inimigo colidiu como um PAREDE - de dentro moveEntidade");
 				return 0;
 			}
 		}
@@ -1576,13 +1616,25 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 		}
 
 		for (inimigo of inimigos) {
-			if (inimigo.xi == _entidade.xi && inimigo.yi == _entidade.yi - 1) {
+			if (inimigo.xi == _entidade.xi && inimigo.yi == _entidade.yi - 1 && _entidade.tipo == tipos.PLAYER ) {
 				sisParticulas(inimigo.x, inimigo.y);
 				criaTextoFlutuante("-10", inimigo.x, inimigo.y);
 				doSangue(inimigo.x,inimigo.y)
 				removeEntidade(inimigo);
 
 				console.log("colidiu como um inimigo");
+				return 0;
+			}
+			if (inimigo.xi == _entidade.xi && inimigo.yi == _entidade.yi - 1 && _entidade.tipo == tipos.INIMIGO ) {
+				criaTextoFlutuante("Bloqueado !", inimigo.x, inimigo.y);
+			
+				console.log("inimigo colidiu como um inimigo - de dentro moveEntidade");
+				return 0;
+			}
+			if (inimigo.xi == _entidade.xi  && inimigo.yi == _entidade.yi - 1 && _entidade.tipo == tipos.PAREDE ) {
+				criaTextoFlutuante("Bloqueado !", inimigo.x, inimigo.y);
+			
+				console.log("inimigo colidiu como um PAREDE - de dentro moveEntidade");
 				return 0;
 			}
 		}
@@ -1614,7 +1666,7 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 			
 					return 0;
 				} else {
-					sisParticulas(Jogador.x + tamanhoCelula, Jogador.y);
+					sisParticulas(_entidade.x + tamanhoCelula, _entidade.y);
 					doSangue(_trap.x,_trap.y)
 					console.log("colidiu com uma trap aberta");
 					//return 0
@@ -1622,14 +1674,27 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 			}
 		}
 		for (inimigo of inimigos) {
-			if (inimigo.xi == _entidade.xi + 1 && inimigo.yi == _entidade.yi) {
+			if (inimigo.xi == _entidade.xi + 1 && inimigo.yi == _entidade.yi && _entidade.tipo == tipos.PLAYER ) {
 				sisParticulas(inimigo.x, inimigo.y);
 				criaTextoFlutuante("-10", inimigo.x, inimigo.y);
 				doSangue(inimigo.x,inimigo.y)
 				removeEntidade(inimigo);
-				console.log("colidiu como um inimigo");
+				console.log("inimigo colidiu com o player - de dentro moveEntidade");
 				return 0;
 			}
+			if (inimigo.xi == _entidade.xi + 1 && inimigo.yi == _entidade.yi && _entidade.tipo == tipos.INIMIGO ) {
+				criaTextoFlutuante("Bloqueado !", inimigo.x, inimigo.y);
+			
+				console.log("inimigo colidiu como um inimigo - de dentro moveEntidade");
+				return 0;
+			}
+			if (inimigo.xi == _entidade.xi +1 && inimigo.yi == _entidade.yi  && _entidade.tipo == tipos.PAREDE ) {
+				criaTextoFlutuante("Bloqueado !", inimigo.x, inimigo.y);
+			
+				console.log("inimigo colidiu como um PAREDE - de dentro moveEntidade");
+				return 0;
+			}
+			
 		}
 		if (Jogador.xi == _entidade.xi + 1 && Jogador.yi == _entidade.yi) {
 			console.log("colidiu com o jogador");
@@ -1660,7 +1725,11 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 					console.log("colidiu com uma trap fechada");
 					return 0;
 				} else {
-					sisParticulas(Jogador.x - tamanhoCelula, Jogador.y);
+
+				doSangue(_entidade.x- tamanhoCelula,_entidade.y)
+						sisParticulas(_entidade.x - tamanhoCelula, _entidade.y);
+				
+					
 
 					console.log("colidiu com uma trap aberta");
 					//return 0
@@ -1669,7 +1738,7 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 		}
 
 		for (inimigo of inimigos) {
-			if (inimigo.xi == _entidade.xi - 1 && inimigo.yi == _entidade.yi) {
+			if (inimigo.xi == _entidade.xi - 1 && inimigo.yi == _entidade.yi && _entidade.tipo == tipos.PLAYER ) {
 				sisParticulas(inimigo.x, inimigo.y);
 				doSangue(inimigo.x,inimigo.y)
 				criaTextoFlutuante("-10", inimigo.x, inimigo.y);
@@ -1678,6 +1747,19 @@ function moveEntidade(_entidade, _x = 0, _y = 0) {
 				console.log("colidiu como um inimigo");
 				return 0;
 			}
+			if (inimigo.xi == _entidade.xi - 1 && inimigo.yi == _entidade.yi && _entidade.tipo == tipos.INIMIGO ) {
+				criaTextoFlutuante("Bloqueado !", inimigo.x, inimigo.y);
+			
+				console.log("inimigo colidiu como um inimigo - de dentro moveEntidade");
+				return 0;
+			}
+			if (inimigo.xi == _entidade.xi -1 && inimigo.yi == _entidade.yi  && _entidade.tipo == tipos.PAREDE ) {
+				criaTextoFlutuante("Bloqueado !", inimigo.x, inimigo.y);
+			
+				console.log("inimigo colidiu como um PAREDE - de dentro moveEntidade");
+				return 0;
+			}
+			
 		}
 		if (Jogador.xi == _entidade.xi - 1 && Jogador.yi == _entidade.yi) {
 			console.log("colidiu com o jogador");
@@ -1853,7 +1935,17 @@ function criaEntidade(
 			tesouros[ini - 1].spr.addImage(bauoff);
 			tesouros[ini - 1].spr.scale = 1.4;
 			tesouros[ini - 1].spr.rotation = 90;
-
+			tesouros[ini - 1].sprSombra = new Sprite(
+				xx - 1,
+				yy + 4,
+				tamanhoCelula,
+				tamanhoCelula
+			);
+			tesouros[ini - 1].sprSombra.overlap(allSprites);
+			tesouros[ini - 1].sprSombra.addImage(selecao.img);
+			tesouros[ini - 1].sprSombra.mirror.y = true;
+			tesouros[ini - 1].sprSombra.rotation = 90;
+				gSombras.push(tesouros[ini - 1].sprSombra)
 			tesouros.entidade = tesouros[ini - 1];
 			return 1;
 		}
@@ -1918,7 +2010,7 @@ function criaEntidade(
 			tamanhoCelula,
 			tamanhoCelula
 		);
-		decoracaoCima[ini - 1].spr.scale = 1.5;
+		
 		if (mirrorx) {
 			decoracaoCima[ini - 1].spr.mirror.x = true;
 		}
@@ -1930,6 +2022,7 @@ function criaEntidade(
 		}
 
 		decoracaoCima[ini - 1].spr.addImage(selecao.img);
+		decoracaoCima[ini - 1].spr.img.scale = 1.5;
 		decoracaoCima[ini - 1].spr.overlap(allSprites);
 		selecao.entidade = decoracaoCima[ini - 1];
 		selecao.spr = decoracaoCima[ini - 1].spr;
@@ -1997,10 +2090,11 @@ function criaEntidade(
 		inimigos[ini - 1].xi = xi;
 		inimigos[ini - 1].yi = yi;
 		// esse nome tem q ter em algum lugar
-		inimigos[ini - 1].nome = "Goblinzitus:" + xi + "x" + yi;
-		inimigos[ini - 1].tipo = tipos.INIMIGO;
+		inimigos[ini - 1].nome = "inimigo:" + xi + "x" + yi;
+		inimigos[ini - 1].tipo = selecao.tipo;
+		inimigos[ini - 1].subtipo = selecao.subtipo;
 		inimigos[ini - 1].engaged = false;
-		inimigos[ini - 1].index = ini - 1;
+		inimigos[ini - 1].index = ini - 1; //tirar isso
 
 		inimigos[ini - 1].sprSombra = new Sprite(
 			xx - 2,
@@ -2008,6 +2102,7 @@ function criaEntidade(
 			tamanhoCelula,
 			tamanhoCelula
 		);
+
 		inimigos[ini - 1].sprSombra.overlap(allSprites);
 		inimigos[ini - 1].sprSombra.addImage(selecao.img);
 		inimigos[ini - 1].sprSombra.mirror.y = true;
@@ -2015,7 +2110,8 @@ function criaEntidade(
 		inimigos[ini - 1].spr.addImage(selecao.img);
 		inimigos[ini - 1].spr.entidade = inimigos[ini - 1];
 		inimigos[ini - 1].spr.overlap(allSprites);
-			gSombras.push(inimigos[ini - 1].sprSombra)
+		
+		gSombras.push(inimigos[ini - 1].sprSombra)
 		selecao.entidade = inimigos[ini - 1];
 		selecao.spr = inimigos[ini - 1].spr;
 		return inimigos[ini - 1];
