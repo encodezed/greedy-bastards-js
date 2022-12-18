@@ -156,6 +156,8 @@ selecao = {
 };
 
 
+
+// [Refactoring, please wait...]
 oSala = {
 	x: 0,
 	y: 0,
