@@ -1,0 +1,171 @@
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/p5.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <script>
+
+
+let abelhas = []; // Vetor para armazenar as abelhas
+let flores = []; // Vetor para armazenar as flores
+let arvores = []; // Vetor para armazenar as árvores
+let colmeia; // Objeto da colmeia
+
+function setup() {
+  createCanvas(400, 400);
+
+  // Crie algumas abelhas aleatórias
+  for (let i = 0; i < 10; i++) {
+    abelhas.push(new Abelha(random(width), random(height)));
+  }
+
+  // Crie algumas flores aleatórias
+  for (let i = 0; i < 5; i++) {
+    flores.push(new Flor(random(width), random(height)));
+  }
+
+  // Crie algumas árvores aleatórias
+  for (let i = 0; i < 3; i++) {
+    arvores.push(new Arvore(random(width), random(height)));
+  }
+
+  // Crie a colmeia no centro da tela
+  colmeia = new Colmeia(width / 2, height / 2);
+}
+
+function draw() {
+  background(255);
+
+  // Atualize a posição de cada abelha
+  for (let abelha of abelhas) {
+    abelha.update();
+  }
+
+  // Desenhe cada abelha na tela
+  for (let abelha of abelhas) {
+    abelha.draw();
+  }
+
+  // Desenhe cada flor na tela
+  for (let flor of flores) {
+    flor.draw();
+  }
+
+  // Desenhe cada árvore na tela
+  for (let arvore of arvores) {
+    arvore.draw();
+  }
+
+  // Desenhe a colmeia na tela
+  colmeia.draw();
+}
+
+class Abelha {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.alimento = 100;
+    this.recurso = 0; // Nova variável para armazenar a quantidade de recurso coletada
+  }
+
+  update() {
+  // Calcule a distância entre a abelha e a colmeia
+  let d = dist(this.x, this.y, colmeia.x, colmeia.y);
+
+  // Se a distância for menor que 10 pixels, considere que a abelha já chegou na colmeia
+  if (d < 10) {
+    // Adicione os recursos coletados à colmeia
+    colmeia.resina += this.resina;
+    colmeia.glicose += this.glicose;
+    // Redefina os recursos da abelha para 0
+    this.resina = 0;
+    this.glicose = 0;
+    // Redefina o alimento para 100 e saia da função update()
+    this.alimento = 100;
+    return;
+  }
+
+  // Se a abelha tiver apenas 10% de alimento, mova-a na direção da colmeia
+  if (this.alimento <= 0.1 * 100) {
+    // Calcule a direção para a colmeia
+    let dx = colmeia.x - this.x;
+    let dy = colmeia.y - this.y;
+    // Normalize a direção
+    let v = createVector(dx, dy);
+    v.normalize();
+    // Multiplique a direção pelo passo da abelha para mover a abelha na direção da colmeia
+    v.mult(0.5); // Use um valor de passo apropriado para a sua simulação
+    this.x += v.x;
+    this.y += v.y;
+  }
+
+  //
+
+
+  // A função draw() fica inalterada aqui
+
+  draw() {
+    // Desenhe as abelhas como círculos brancos
+    fill(255);
+    ellipse(this.x, this.y, 10, 10);
+  }
+}
+
+// Classe para as flores
+class Flor {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  draw() {
+    // Desenhe as flores como círculos azuis
+    fill(0, 0, 255);
+    ellipse(this.x, this.y, 20, 20);
+  }
+}
+
+// Classe para as árvores
+class Arvore {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  draw() {
+    // Desenhe as árvores como retângulos verdes
+    fill(0, 255, 0);
+    rect(this.x - 20, this.y - 40, 40, 80);
+  }
+}
+
+
+// Classe para a colmeia
+class Colmeia {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  draw() {
+    // Desenhe a colmeia como um círculo amarelo
+    fill(255, 255, 0);
+    ellipse(this.x, this.y, 30, 30);
+  }
+}
+
+
+
+
+
+
+</script>
+
+</body>

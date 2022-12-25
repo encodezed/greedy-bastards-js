@@ -2260,3 +2260,5 @@ function criaEntidade(
 		tabuleiro[xi][yi].remove();
 	}
 }
+
+
